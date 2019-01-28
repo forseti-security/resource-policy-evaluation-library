@@ -15,6 +15,11 @@ class ResourceBase(metaclass=ABCMeta):
 
 class GoogleAPIResourceBase(ResourceBase, metaclass=ABCMeta):
 
+    # Names of the get and update methods. Most are the same but override in
+    # the Resource if necessary
+    get_method = "get"
+    update_method = "update"
+
     def __init__(self, resource_data, **kwargs):
         full_resource_path = "{}.{}".format(
             self.service_name,
@@ -31,8 +36,8 @@ class GoogleAPIResourceBase(ResourceBase, metaclass=ABCMeta):
 
     def get(self):
         method = getattr(self.service, self.get_method)
-
         return method(**self._get_request_args()).execute()
 
-    def update(self):
-        pass
+    def update(self, body):
+        method = getattr(self.service, self.update_method)
+        return method(**self._update_request_args(body)).execute()
