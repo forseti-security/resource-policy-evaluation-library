@@ -4,19 +4,22 @@ from .sql import SQLInstance     # noqa F401
 from .bigquery import BQDataset  # noqa F401
 
 
-def resource_lookup(context):
+class Resource():
 
-    resource_kind_map = {
-        'storage#bucket': Bucket,
-        'bigquery#dataset': BQDataset,
-        'sql#instance': SQLInstance
-    }
+    @staticmethod
+    def factory(resource_data):
+        resource_kind_map = {
+            'storage#bucket': Bucket,
+            'bigquery#dataset': BQDataset,
+            'sql#instance': SQLInstance
+        }
 
-    kind = context.get('resource_kind')
-    if not kind:
-        return None
+        kind = resource_data.get('resource_kind')
+        if not kind:
+            assert 0, 'Unrecognized resource'
 
-    if kind not in resource_kind_map:
-        return None
+        if kind not in resource_kind_map:
+            assert 0, 'Unrecognized resource'
 
-    return resource_kind_map.get(kind)
+        cls = resource_kind_map.get(kind)
+        return cls(resource_data)
