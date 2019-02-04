@@ -57,5 +57,5 @@ class PythonPolicyEngine:
         for cls in self.policies(resource):
             policy = cls(resource)
             if not policy.evaluate():
-                violations.append(cls)
+                violations.append(policy)
         return violations
