@@ -53,3 +53,13 @@ class OpenPolicyAgent:
         )
         input = {'input': resource.get()}
         return self._opa_request(violations_path, method='POST', data=input)
+
+    def remediate(self, resource, violation):
+        rem_path = '{}/policy/{}/remediate'.format(
+            self._get_policy_path(resource),
+            violation
+        )
+        input = {'input': resource.get()}
+        remediated = self._opa_request(rem_path, method='POST', data=input)
+
+        resource.update(remediated)
