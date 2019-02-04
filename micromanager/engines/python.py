@@ -59,3 +59,6 @@ class PythonPolicyEngine:
             if not policy.evaluate():
                 violations.append(policy)
         return violations
+
+    def remediate(self, resource, violation):
+        violation.remediate(resource)
