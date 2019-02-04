@@ -34,6 +34,9 @@ class GoogleAPIResourceBase(ResourceBase, metaclass=ABCMeta):
 
         self.resource_data = resource_data
 
+    def type(self):
+        return ".".join(["gcp", self.service_name, self.resource_path])
+
     def get(self):
         method = getattr(self.service, self.get_method)
         return method(**self._get_request_args()).execute()
