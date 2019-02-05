@@ -16,6 +16,7 @@ setup(
     ],
     packages=[
         'micromanager',
+        'micromanager.engines',
         'micromanager.resources',
     ],
     package_data={},
