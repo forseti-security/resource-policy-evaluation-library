@@ -7,7 +7,7 @@ from .bigquery import BQDataset  # noqa F401
 class Resource():
 
     @staticmethod
-    def factory(resource_data):
+    def factory(resource_data, **kargs):
         resource_kind_map = {
             'storage#bucket': Bucket,
             'bigquery#dataset': BQDataset,
@@ -22,4 +22,4 @@ class Resource():
             assert 0, 'Unrecognized resource'
 
         cls = resource_kind_map.get(kind)
-        return cls(resource_data)
+        return cls(resource_data, **kargs)
