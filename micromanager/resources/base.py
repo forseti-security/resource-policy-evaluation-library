@@ -1,8 +1,26 @@
-from abc import ABCMeta, abstractmethod
-from googleapiclienthelpers.discovery import build_subresource
+from abc import ABC, abstractmethod
 
 
-class ResourceBase(metaclass=ABCMeta):
+class Resource(ABC):
+
+    @staticmethod
+    def factory(platform, resource_data, **kargs):
+        """ Return a resource from the appropriate platform """
+        from .gcp import GoogleAPIResource
+
+        resource_platform_map = {
+            'gcp': GoogleAPIResource
+        }
+
+        try:
+            resource = resource_platform_map[platform].factory(
+                resource_data,
+                **kargs
+            )
+        except KeyError:
+            raise AttributeError('Unrecognized platform')
+
+        return resource
 
     @abstractmethod
     def get(self):
@@ -12,35 +30,6 @@ class ResourceBase(metaclass=ABCMeta):
     def update(self):
         pass
 
-
-class GoogleAPIResourceBase(ResourceBase, metaclass=ABCMeta):
-
-    # Names of the get and update methods. Most are the same but override in
-    # the Resource if necessary
-    get_method = "get"
-    update_method = "update"
-
-    def __init__(self, resource_data, **kwargs):
-        full_resource_path = "{}.{}".format(
-            self.service_name,
-            self.resource_path
-        )
-
-        self.service = build_subresource(
-            full_resource_path,
-            self.version,
-            **kwargs
-        )
-
-        self.resource_data = resource_data
-
+    @abstractmethod
     def type(self):
-        return ".".join(["gcp", self.service_name, self.resource_path])
-
-    def get(self):
-        method = getattr(self.service, self.get_method)
-        return method(**self._get_request_args()).execute()
-
-    def update(self, body):
-        method = getattr(self.service, self.update_method)
-        return method(**self._update_request_args(body)).execute()
+        pass
