@@ -1,4 +1,6 @@
 from .base import Resource
+from micromanager.exceptions import is_retryable_exception
+import tenacity
 from googleapiclienthelpers.discovery import build_subresource
 
 
@@ -48,7 +50,13 @@ class GoogleAPIResource(Resource):
         method = getattr(self.service, self.get_method)
         return method(**self._get_request_args()).execute()
 
+    @tenacity.retry(
+        retry=tenacity.retry_if_exception(is_retryable_exception),
+        wait=tenacity.wait_random_exponential(multiplier=1, max=10),
+        stop=tenacity.stop_after_attempt(10)
+    )
     def update(self, body):
+        print('trying')
         method = getattr(self.service, self.update_method)
         return method(**self._update_request_args(body)).execute()
 
