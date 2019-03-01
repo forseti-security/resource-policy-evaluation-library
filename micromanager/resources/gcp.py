@@ -8,6 +8,7 @@ class GoogleAPIResource(Resource):
 
     # Names of the get and update methods. Most are the same but override in
     # the Resource if necessary
+    resource_property = ""
     get_method = "get"
     update_method = "update"
 
@@ -44,7 +45,16 @@ class GoogleAPIResource(Resource):
         return cls(resource_data, **kargs)
 
     def type(self):
-        return ".".join(["gcp", self.service_name, self.resource_path])
+        type_components = ["gcp", self.service_name, self.resource_path]
+
+        # Things like IAM policy are not separate resources, but rather
+        # properties of a resource. We may want to evaluate policy on these
+        # properties, so we represent them as resources and need to distinguish
+        # them in the resource type.
+        if self.resource_property:
+            type_components.append(self.resource_property)
+
+        return ".".join(type_components)
 
     def get(self):
         method = getattr(self.service, self.get_method)
