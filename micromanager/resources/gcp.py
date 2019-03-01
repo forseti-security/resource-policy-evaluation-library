@@ -30,6 +30,7 @@ class GoogleAPIResource(Resource):
     def factory(resource_data, **kargs):
         resource_type_map = {
             'storage.buckets': GcpStorageBucket,
+            'storage.buckets.iam': GcpStorageBucketIamPolicy,
             'bigquery.datasets': GcpBigqueryDataset,
             'sqladmin.instances': GcpSqlInstance
         }
@@ -66,7 +67,6 @@ class GoogleAPIResource(Resource):
         stop=tenacity.stop_after_attempt(10)
     )
     def update(self, body):
-        print('trying')
         method = getattr(self.service, self.update_method)
         return method(**self._update_request_args(body)).execute()
 
@@ -99,14 +99,23 @@ class GcpStorageBucket(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'bucket': self.resource_data['resource_name']
+            'bucket': self.resource_data['resource_name'],
+            'userProject': self.resource_data['project_id']
         }
 
     def _update_request_args(self, body):
         return {
             'bucket': self.resource_data['resource_name'],
+            'userProject': self.resource_data['project_id'],
             'body': body
         }
+
+
+class GcpStorageBucketIamPolicy(GcpStorageBucket):
+
+    resource_property = "iam"
+    get_method = "getIamPolicy"
+    update_method = "setIamPolicy"
 
 
 class GcpSqlInstance(GoogleAPIResource):
