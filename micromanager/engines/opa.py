@@ -11,10 +11,9 @@ class OpenPolicyAgent:
 
     def __init__(self, opa_base_url):
         self.opa_base_url = opa_base_url
-        self.fetch_policies()
 
-    def fetch_policies(self):
-        self.configured_policies = self._opa_request('policies/list')
+    def configured_policies(self):
+        return self._opa_request('policies/list')
 
     def _opa_request(self, path, method='GET', data=None):
         url = '{}/{}'.format(self.opa_base_url, path)

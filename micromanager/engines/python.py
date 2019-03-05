@@ -33,6 +33,11 @@ class PythonPolicyEngine:
                                 self.policy_map[resource_type] = []
                             self.policy_map[resource_type].append(obj)
 
+    def configured_policies(self):
+        # adding for compatibility
+        # todo: implement me
+        return []
+
     def policies(self, resource):
         """
         Args:

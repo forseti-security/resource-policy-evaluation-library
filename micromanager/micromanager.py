@@ -20,6 +20,13 @@ class MicroManager:
 
         self.policy_engines.append(engine)
 
+    def get_configured_policies(self):
+        policies = {}
+        for pe in self.policy_engines:
+            policies[str(pe)] = pe.configured_policies()
+
+        return policies
+
     def violations(self, resource):
         violations = []
         for pe in self.policy_engines:
