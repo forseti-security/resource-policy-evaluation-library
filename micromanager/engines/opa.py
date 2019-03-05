@@ -1,5 +1,10 @@
 from urllib import request
+from urllib.error import URLError
 import json
+
+
+class NoSuchEndpoint(URLError):
+    pass
 
 
 class OpenPolicyAgent:
@@ -18,8 +23,12 @@ class OpenPolicyAgent:
         )
 
         with request.urlopen(req) as resp:
-            resp_data = resp.read().decode('utf-8')
-            return json.loads(resp_data).get('result')
+            decoded_resp = resp.read().decode('utf-8')
+            deserialized_resp = json.loads(decoded_resp)
+            if 'result' not in deserialized_resp:
+                raise NoSuchEndpoint("Endpoint {} not found on the OPA server.".format(url))
+
+            return deserialized_resp['result']
 
     def _get_policy_path(self, resource):
         # policy lookups are based on the resource type
