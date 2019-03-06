@@ -1,4 +1,5 @@
 import json
+import tenacity
 
 from urllib import request
 
@@ -14,6 +15,11 @@ class OpenPolicyAgent:
     def configured_policies(self):
         return self._opa_request('policies/list')
 
+    @tenacity.retry(
+        retry=tenacity.retry_if_exception(is_retryable_exception),
+        wait=tenacity.wait_random_exponential(multiplier=1, max=10),
+        stop=tenacity.stop_after_attempt(5)
+    )
     def _opa_request(self, path, method='GET', data=None):
         url = '{}/{}'.format(self.opa_base_url, path)
         headers = {'Content-type': 'application/json'}
