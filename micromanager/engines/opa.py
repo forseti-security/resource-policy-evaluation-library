@@ -1,10 +1,9 @@
-from urllib import request
-from urllib.error import URLError
 import json
 
+from urllib import request
 
-class NoSuchEndpoint(URLError):
-    pass
+from micromanager.exceptions import is_retryable_exception
+from micromanager.exceptions import NoSuchEndpoint
 
 
 class OpenPolicyAgent:

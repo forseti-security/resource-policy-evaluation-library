@@ -1,4 +1,5 @@
 from googleapiclient.errors import HttpError
+from urllib.error import URLError
 
 
 def is_retryable_exception(err):
@@ -13,4 +14,11 @@ def is_retryable_exception(err):
     if isinstance(err, HttpError):
         return err.resp.status in [409]
 
+    if isinstance(err, URLError):
+        return not isinstance(err, NoSuchEndpoint)
+
     return False
+
+
+class NoSuchEndpoint(URLError):
+    pass
