@@ -29,10 +29,11 @@ class GoogleAPIResource(Resource):
     @staticmethod
     def factory(resource_data, **kargs):
         resource_type_map = {
-            'storage.buckets': GcpStorageBucket,
-            'storage.buckets.iam': GcpStorageBucketIamPolicy,
             'bigquery.datasets': GcpBigqueryDataset,
-            'sqladmin.instances': GcpSqlInstance
+            'compute.instances': GcpComputeInstance,
+            'sqladmin.instances': GcpSqlInstance,
+            'storage.buckets': GcpStorageBucket,
+            'storage.buckets.iam': GcpStorageBucketIamPolicy
         }
 
         resource_type = resource_data.get('resource_type')
@@ -88,6 +89,27 @@ class GcpBigqueryDataset(GoogleAPIResource):
             'datasetId': self.resource_data['resource_name'],
             'projectId': self.resource_data['project_id'],
             'body': body
+        }
+
+
+class GcpComputeInstance(GoogleAPIResource):
+
+    service_name = "compute"
+    resource_path = "instances"
+    version = "v1"
+
+    def _get_request_args(self):
+        return {
+            'instance': self.resource_data['resource_name'],
+            'zone': self.resource_data['resource_location'],
+            'project': self.resource_data['project_id']
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'instance': self.resource_data['resource_name'],
+            'zone': self.resource_data['resource_location'],
+            'project': self.resource_data['project_id']
         }
 
 
