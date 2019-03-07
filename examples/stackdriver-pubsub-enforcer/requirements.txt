@@ -1,4 +1,0 @@
-micromanager
-jmespath
-google-cloud-pubsub
-google-auth
