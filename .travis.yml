@@ -3,7 +3,7 @@ sudo: false
 dist: xenial
 cache:
   directories:
-  - ${HOME}/.cache
+  - "${HOME}/.cache"
 matrix:
   include:
   - python: 3.4
@@ -20,3 +20,11 @@ script:
 - tox
 notifications:
   email: false
+deploy:
+  provider: pypi
+  user: cleardata
+  password:
+    secure: fcuM3Jhh801uYSfKeYlKUREhzFfrLRY4i6n86MeXfsO1dQdR1tk08wVf8ShrD2L55pGAgHS1F5XDOcLUJKOtpHmx7ZwMFumWwjFiRZ06rEO+BJJLSBjDqZ0oe/luDOEc41Z9n5uz7bTIWPyTvsxjb5vwhRlhpxPuG+DNCvav0JU8Lbc1o5Qph2serqHQzr3N8O8CrIi2mwOGDRpOV4Y9VUTN9YsKyuPYKjBel7cmeMQ3yhe8sOL/7gTYKVVT/OeqxKtZ8XJzdX6rVQG7gz9DTCjKx0adCfdTjEZGPn13/RDkD1WZ/iPILjHMYtSQ7EYYiI79FVhGeXpRCmUfOGibrVcmV1HLFMqhlA+PJ1Ym6DvDHGdRmiYo224XR6aqhdqyA3x1yhluvR3n90jgydXh0R0Lwv4jEghbOUS4/6PccTrbjjod9bNaD3KPMP9orIghKWftinyfEiDt2VBzIrb34KPNQNf+BX9VB+HVxhfLYFYKqsZG93Bg+GHiysvz1QfF+4xdP63m8wE33eTwqk0Tn+yThEoP6QBaZazOsqOu0Q0wLqNviFPh2VTDw6RtFx2BTY2laxHLw7sFpKJuzPIGOdefK265dHJXvgXyZqdpGFSuyADNbUVC49YoBOW6g9qT8Tk4MeV+MxRys2bFs+3G0SCK4ZdTLND1qGZo7p1OoRY=
+  on:
+    tags: true
+  skip_existing: true
