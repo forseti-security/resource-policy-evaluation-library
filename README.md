@@ -2,6 +2,10 @@
 
 The micro-manager evaluates whether or not a given resource adheres to defined policies. It also attempts to remediate any policy violations.
 
+[![Build Status](https://travis-ci.com/cleardataeng/micromanager.svg?branch=master)](https://travis-ci.com/cleardataeng/micromanager)
+[![PyPI version](https://badge.fury.io/py/micromanager.svg)](https://badge.fury.io/py/micromanager)
+
+
 ---
 
 ## Resources
