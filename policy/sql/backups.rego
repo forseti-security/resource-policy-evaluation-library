@@ -23,11 +23,15 @@ _settings[key]=value{
 
 _settings[key]=value{
   key := "backupConfiguration"
-  value := {
-    "binaryLogEnabled": true,
-    "enabled": true,
-    "kind": "sql#backupConfiguration",
-    "replicationLogArchivingEnabled": false,
-    "startTime": "00:00"
-  }
+  value := _backupConfiguration
+}
+
+_backupConfiguration[key] = value {
+  key != "enabled"
+  input.settings.backupConfiguration[key] = value
+}
+
+_backupConfiguration[key] = value {
+  key := "enabled"
+  value := true
 }
