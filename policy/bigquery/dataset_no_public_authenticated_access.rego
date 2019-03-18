@@ -1,4 +1,4 @@
-package gcp.bigquery.datasets.policy.no_public_access
+package gcp.bigquery.datasets.policy.no_public_authenticated_access
 
 #####
 # Policy evaluation
@@ -8,7 +8,7 @@ default valid = true
 
 valid = false {
   # Check for bad acl
-  input.access[_].specialGroup == "allUsers"
+  input.access[_].specialGroup == "allAuthenticatedUsers"
 
   # Also, this must be false
   not data.exclusions.label_exclude(input.labels)
@@ -36,8 +36,8 @@ _access= [acl | acl := input.access[_]
 ]
 
 _valid_acl(acl) = true {
-  # If the specialGroup is anything other than "allUsers"
-  acl.specialGroup != "allUsers"
+  # If the specialGroup is anything other than "allAuthenticatedUsers"
+  acl.specialGroup != "allAuthenticatedUsers"
 }{
   # Or if there is no specialGroup key
   not acl["specialGroup"]
