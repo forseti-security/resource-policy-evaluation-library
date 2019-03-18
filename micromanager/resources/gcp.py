@@ -31,6 +31,7 @@ class GoogleAPIResource(Resource):
         resource_type_map = {
             'bigquery.datasets': GcpBigqueryDataset,
             'compute.instances': GcpComputeInstance,
+            'cloudresourcemanager.projects.iam': GcpProjectIam,
             'sqladmin.instances': GcpSqlInstance,
             'storage.buckets': GcpStorageBucket,
             'storage.buckets.iam': GcpStorageBucketIamPolicy
@@ -156,5 +157,25 @@ class GcpSqlInstance(GoogleAPIResource):
         return {
             'instance': self.resource_data['resource_name'],
             'project': self.resource_data['project_id'],
+            'body': body
+        }
+
+
+class GcpProjectIam(GoogleAPIResource):
+
+    service_name = "cloudresourcemanager"
+    resource_path = "projects"
+    version = "v1"
+    get_method = "getIamPolicy"
+    update_method = "setIamPolicy"
+
+    def _get_request_args(self):
+        return {
+            'resource': self.resource_data['resource_name']
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'resource': self.resource_data['resource_name'],
             'body': body
         }
