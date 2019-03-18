@@ -163,6 +163,7 @@ class GcpSqlInstance(GoogleAPIResource):
 
 class GcpProjectIam(GoogleAPIResource):
 
+    resource_property = "iam"
     service_name = "cloudresourcemanager"
     resource_path = "projects"
     version = "v1"
