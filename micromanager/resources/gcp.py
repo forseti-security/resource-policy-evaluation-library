@@ -8,7 +8,7 @@ class GoogleAPIResource(Resource):
 
     # Names of the get and update methods. Most are the same but override in
     # the Resource if necessary
-    resource_property = ""
+    resource_property = None
     get_method = "get"
     update_method = "update"
 
@@ -24,13 +24,30 @@ class GoogleAPIResource(Resource):
             **kwargs
         )
 
+        # If we are a property of a resource, also get the resource we're
+        # associated with
+        if self.is_property():
+            # Build resource data for the parent
+            parent_data = resource_data.copy()
+            parent_type = resource_data['resource_type'].rsplit('.', 1)[0]
+            parent_data['resource_type'] = parent_type
+
+            self.parent_resource = GoogleAPIResource.factory(
+                parent_data,
+                **kwargs
+            )
+
         self.resource_data = resource_data
+
+    def is_property(self):
+        return self.resource_property is not None
 
     @staticmethod
     def factory(resource_data, **kargs):
         resource_type_map = {
             'bigquery.datasets': GcpBigqueryDataset,
             'compute.instances': GcpComputeInstance,
+            'cloudresourcemanager.projects': GcpProject,
             'cloudresourcemanager.projects.iam': GcpProjectIam,
             'sqladmin.instances': GcpSqlInstance,
             'storage.buckets': GcpStorageBucket,
@@ -54,14 +71,20 @@ class GoogleAPIResource(Resource):
         # properties of a resource. We may want to evaluate policy on these
         # properties, so we represent them as resources and need to distinguish
         # them in the resource type.
-        if self.resource_property:
+        if self.is_property():
             type_components.append(self.resource_property)
 
         return ".".join(type_components)
 
     def get(self):
         method = getattr(self.service, self.get_method)
-        return method(**self._get_request_args()).execute()
+        asset = method(**self._get_request_args()).execute()
+
+        # if this asset is a property, inject its parent
+        if self.is_property():
+            parent = self.parent_resource.get()
+            asset['_resource'] = parent
+        return asset
 
     @tenacity.retry(
         retry=tenacity.retry_if_exception(is_retryable_exception),
@@ -69,6 +92,11 @@ class GoogleAPIResource(Resource):
         stop=tenacity.stop_after_attempt(10)
     )
     def update(self, body):
+
+        # remove injected data before attempting update
+        if self.is_property() and '_resource' in body:
+            del body['_resource']
+
         method = getattr(self.service, self.update_method)
         return method(**self._update_request_args(body)).execute()
 
@@ -161,12 +189,27 @@ class GcpSqlInstance(GoogleAPIResource):
         }
 
 
-class GcpProjectIam(GoogleAPIResource):
+class GcpProject(GoogleAPIResource):
 
-    resource_property = "iam"
     service_name = "cloudresourcemanager"
     resource_path = "projects"
     version = "v1"
+
+    def _get_request_args(self):
+        return {
+            'projectId': self.resource_data['resource_name']
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'projectId': self.resource_data['resource_name'],
+            'body': body
+        }
+
+
+class GcpProjectIam(GcpProject):
+
+    resource_property = "iam"
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
