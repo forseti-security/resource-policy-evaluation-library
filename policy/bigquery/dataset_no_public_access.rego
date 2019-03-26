@@ -16,6 +16,12 @@ valid = false {
   # Check for bad acl
   input.access[_].iamMember == "allUsers"
 
+  # Just in case labels are not in the input
+  not labels
+} else = false {
+  # Check for bad acl
+  input.access[_].iamMember == "allUsers"
+
   # Also, this must be false
   not data.exclusions.label_exclude(labels)
 }

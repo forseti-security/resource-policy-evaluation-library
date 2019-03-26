@@ -16,6 +16,12 @@ valid = false {
   # Check for bad acl
   input.access[_].specialGroup == "allAuthenticatedUsers"
 
+  # Just in case labels are not in the input
+  not labels
+} else = false {
+  # Check for bad acl
+  input.access[_].specialGroup == "allAuthenticatedUsers"
+
   # Also, this must be false
   not data.exclusions.label_exclude(labels)
 }
