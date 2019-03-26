@@ -14,7 +14,7 @@ default valid = true
 
 valid = false {
   # Check for bad acl
-  input.access[_].specialGroup == "allUsers"
+  input.access[_].iamMember == "allUsers"
 
   # Also, this must be false
   not data.exclusions.label_exclude(labels)
@@ -42,9 +42,9 @@ _access= [acl | acl := input.access[_]
 ]
 
 _valid_acl(acl) = true {
-  # If the specialGroup is anything other than "allUsers"
-  acl.specialGroup != "allUsers"
+  # If the iamMember is anything other than "allUsers"
+  acl.iamMember != "allUsers"
 }{
-  # Or if there is no specialGroup key
-  not acl["specialGroup"]
+  # Or if there is no iamMember key
+  not acl["iamMember"]
 }
