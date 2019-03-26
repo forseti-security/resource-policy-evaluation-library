@@ -12,13 +12,22 @@ labels = input.settings.userLabels
 
 default valid=true
 
+
 valid = false {
+  # Check for bad acl
+  input.settings.ipConfiguration.authorizedNetworks[_].value == "0.0.0.0/0"
+
+  # Sometimes the sqladmin doesn't include labels (which means no matching labels)
+  not labels
+} else = false {
   # Check for bad acl
   input.settings.ipConfiguration.authorizedNetworks[_].value == "0.0.0.0/0"
 
   # Also, this must be false
   not data.exclusions.label_exclude(labels)
 }
+
+
 
 #####
 # Remediation
