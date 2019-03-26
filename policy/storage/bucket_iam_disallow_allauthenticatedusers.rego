@@ -17,6 +17,12 @@ valid = false {
   # Check for bad policy
   input.bindings[_].members[_] == "allAuthenticatedUsers"
 
+  # Just in case labels are not in the input
+  not labels
+} else = false {
+  # Check for bad policy
+  input.bindings[_].members[_] == "allAuthenticatedUsers"
+
   # Also, make sure this resource isn't excluded by label
   not data.exclusions.label_exclude(labels)
 }
