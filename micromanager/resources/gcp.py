@@ -2,6 +2,7 @@ from .base import Resource
 from micromanager.exceptions import is_retryable_exception
 import tenacity
 from googleapiclienthelpers.discovery import build_subresource
+from googleapiclienthelpers.waiter import Waiter
 
 
 class GoogleAPIResource(Resource):
@@ -11,6 +12,15 @@ class GoogleAPIResource(Resource):
     resource_property = None
     get_method = "get"
     update_method = "update"
+
+    # If a resource is not in a ready state, we can't update it. If we retrieve
+    # it, and the state changes, updates will be rejected because the ETAG will
+    # have changed. If a resource defines readiness criteria, the get() call
+    # will wait until the resource is in a ready state to return
+    #
+    # Key/Value to check to see if a resource is ready
+    readiness_key = None
+    readiness_value = None
 
     def __init__(self, resource_data, **kwargs):
         full_resource_path = "{}.{}".format(
@@ -78,7 +88,18 @@ class GoogleAPIResource(Resource):
 
     def get(self):
         method = getattr(self.service, self.get_method)
-        asset = method(**self._get_request_args()).execute()
+
+        # If the resource has readiness criteria, wait for it
+        if self.readiness_key and self.readiness_value:
+            waiter = Waiter(method, **self._get_request_args())
+            asset = waiter.wait(
+                self.readiness_key,
+                self.readiness_value,
+                interval=7,
+                retries=60
+            )
+        else:
+            asset = method(**self._get_request_args()).execute()
 
         # if this asset is a property, inject its parent
         if self.is_property():
@@ -174,6 +195,8 @@ class GcpSqlInstance(GoogleAPIResource):
     service_name = "sqladmin"
     resource_path = "instances"
     version = "v1beta4"
+    readiness_key = 'state'
+    readiness_value = 'RUNNABLE'
 
     def _get_request_args(self):
         return {
