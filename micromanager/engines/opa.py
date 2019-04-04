@@ -20,6 +20,7 @@ from urllib import request
 
 from micromanager.exceptions import is_retryable_exception
 from micromanager.exceptions import NoSuchEndpoint
+from micromanager.exceptions import NoPossibleRemediation
 
 
 class OpenPolicyAgent:
@@ -95,4 +96,7 @@ class OpenPolicyAgent:
         input = {'input': resource.get()}
         remediated = self._opa_request(rem_path, method='POST', data=input)
 
-        resource.update(remediated)
+        if remediated:
+            resource.update(remediated)
+        else:
+            raise NoPossibleRemediation("Remediation is not possible")
