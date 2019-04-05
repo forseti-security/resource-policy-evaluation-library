@@ -259,5 +259,8 @@ class GcpProjectIam(GcpProject):
     def _update_request_args(self, body):
         return {
             'resource': self.resource_data['resource_name'],
-            'body': body
+            'body': {
+                'policy': body,
+                'updateMask': "bindings,etag,auditConfigs"
+            }
         }
