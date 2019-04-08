@@ -1,4 +1,4 @@
-# micromanager
+# Resource Policy Evaluation Library (rpe-lib)
 
 The micromanager evaluates whether or not a given resource adheres to defined policies. It also attempts to remediate any policy violations.
 
