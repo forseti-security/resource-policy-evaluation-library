@@ -17,7 +17,7 @@ from .engines import OpenPolicyAgent
 from .engines import PythonPolicyEngine
 
 
-class MicroManager:
+class RPE:
 
     def __init__(self, config):
         self.policy_engines = []

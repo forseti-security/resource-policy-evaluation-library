@@ -13,4 +13,4 @@
 # limitations under the License.
 
 
-from .micromanager import MicroManager  # noqa: F401
+from .rpe import RPE  # noqa: F401

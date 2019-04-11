@@ -15,12 +15,12 @@
 
 import pytest
 
-from micromanager.resources import Resource
-from micromanager.resources.gcp import GcpBigqueryDataset
-from micromanager.resources.gcp import GcpComputeInstance
-from micromanager.resources.gcp import GcpSqlInstance
-from micromanager.resources.gcp import GcpStorageBucket
-from micromanager.resources.gcp import GcpStorageBucketIamPolicy
+from rpe.resources import Resource
+from rpe.resources.gcp import GcpBigqueryDataset
+from rpe.resources.gcp import GcpComputeInstance
+from rpe.resources.gcp import GcpSqlInstance
+from rpe.resources.gcp import GcpStorageBucket
+from rpe.resources.gcp import GcpStorageBucketIamPolicy
 
 test_cases = [
     (

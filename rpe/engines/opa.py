@@ -18,9 +18,9 @@ import tenacity
 
 from urllib import request
 
-from micromanager.exceptions import is_retryable_exception
-from micromanager.exceptions import NoSuchEndpoint
-from micromanager.exceptions import NoPossibleRemediation
+from rpe.exceptions import is_retryable_exception
+from rpe.exceptions import NoSuchEndpoint
+from rpe.exceptions import NoPossibleRemediation
 
 
 class OpenPolicyAgent:

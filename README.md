@@ -1,6 +1,6 @@
-# micromanager
+# resource-policy-evaluation-library
 
-The micromanager evaluates whether or not a given resource adheres to defined policies. It also attempts to remediate any policy violations.
+The resource-policy-evaluation-library (rpe-lib) evaluates whether or not a given resource adheres to defined policies. It also attempts to remediate any policy violations.
 
 [![Build Status](https://travis-ci.com/cleardataeng/micromanager.svg?branch=master)](https://travis-ci.com/cleardataeng/micromanager)
 [![PyPI version](https://badge.fury.io/py/micromanager.svg)](https://badge.fury.io/py/micromanager)
@@ -9,7 +9,7 @@ The micromanager evaluates whether or not a given resource adheres to defined po
 
 ## Resources
 
-Micromanager expects a fairly simple interface to any resource you wish to evaluate policy on. It expects an object with the following functions defined:
+The library works on `resources` and expects a fairly simple interface to any resource you wish to evaluate policy on. It expects an object with the following functions defined:
 
 ```
 class MyResource:
@@ -21,17 +21,18 @@ class MyResource:
     # Takes the body of a resource, and attempts to update the resource
     def update(self, body):
         pass
+
     # Returns the resource type as a string
     #  Note: This should be a dotted-string that the engines will use to determine what policies are relevant
     type(self):
         pass
 ```
 
-Some resources are provided with micromanager, and hopefully that will continue to grow, but it's not required that you use the provided resource classes.
+Some resources are provided with rpe-lib, and hopefully that will continue to grow, but it's not required that you use the provided resource classes.
 
 ## Engines
 
-The policy evaluation and enforcement is handled by _policy engines_:
+Policy evaluation/enforcement is handled by the _policy engines_:
 
 ### Open Policy Agent Engine
 
@@ -68,10 +69,10 @@ This assumes you have the `opa` binary in your path
 opa run --server ./policy/
 ```
 
-Now we need to create a MicroManager instance with the opa engine configured to use the local OPA server:
+Now we need to create an RPE instance with the opa engine configured to use the local OPA server:
 
 ```
-from micromanager import MicroManager
+from rpe import RPE
 
 config = {
     'policy_engines': [
@@ -93,8 +94,8 @@ res = Resource.factory(
   credentials=<gcp-credentials>
 )
 
-mm = MicroManager(config)
-violations = mm.violations(res)
+rpe = RPE(config)
+violations = rpe.violations(res)
 
 for (engine, violation) in violations:
     print(engine, violation)
@@ -105,4 +106,4 @@ for (engine, violation) in violations:
 
 # Uses
 
-* [Forseti Policy Engine](https://github.com/cleardataeng/forseti-policy-enforcer) - The Forseti Policy Engine uses micromanger for evaluation and enforcment of Google Cloud resources. It uses a Stackdriver log export to a Pub/Sub topic to trigger enforcement
+* [Forseti Real-time Enforcer](https://github.com/forseti-security/real-time-enforcer) - The Forseti Real-time enforcer uses rpe-lib for the evaluation and enforcement of policy for Google Cloud resources. It uses a Stackdriver log export to a Pub/Sub topic to trigger enforcement.
