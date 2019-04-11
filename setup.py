@@ -18,11 +18,10 @@ from __future__ import print_function
 from setuptools import setup
 
 setup(
-    name="micromanager",
-    description="Policy enforcement tool for GCP",
-    long_description='Tool to load resources from GCP, check them against policies written in Rego, and attempt remediation of policy violations.',
+    name="rpe-lib",
+    description="A resource policy evaluation library",
     author="Joe Ceresini",
-    url="https://github.com/cleardataeng/micromanager",
+    url="https://github.com/forseti-security/resource-policy-evaluation-library",
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
     install_requires=[
@@ -31,12 +30,11 @@ setup(
         'tenacity',
     ],
     packages=[
-        'micromanager',
-        'micromanager.engines',
-        'micromanager.resources',
+        'rpe',
+        'rpe.engines',
+        'rpe.resources',
     ],
     package_data={},
     license="Apache 2.0",
     keywords="gcp policy enforcement",
 )
-

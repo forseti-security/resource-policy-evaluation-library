@@ -14,7 +14,7 @@
 
 
 from .base import Resource
-from micromanager.exceptions import is_retryable_exception
+from rpe.exceptions import is_retryable_exception
 import tenacity
 from googleapiclienthelpers.discovery import build_subresource
 from googleapiclienthelpers.waiter import Waiter
