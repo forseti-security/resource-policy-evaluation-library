@@ -2,8 +2,8 @@
 
 The resource-policy-evaluation-library (rpe-lib) evaluates whether or not a given resource adheres to defined policies. It also attempts to remediate any policy violations.
 
-[![Build Status](https://travis-ci.com/cleardataeng/micromanager.svg?branch=master)](https://travis-ci.com/cleardataeng/micromanager)
-[![PyPI version](https://badge.fury.io/py/micromanager.svg)](https://badge.fury.io/py/micromanager)
+[![Build Status](https://api.travis-ci.org/forseti-security/resource-policy-evaluation-library.svg?branch=master)](https://travis-ci.org/forseti-security/resource-policy-evaluation-library/)
+[![PyPI version](https://badge.fury.io/py/rpe-lib.svg)](https://badge.fury.io/py/rpe-lib)
 
 ---
 
