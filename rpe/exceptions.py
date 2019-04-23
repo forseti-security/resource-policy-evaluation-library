@@ -38,5 +38,6 @@ def is_retryable_exception(err):
 class NoSuchEndpoint(URLError):
     pass
 
+
 class NoPossibleRemediation(Exception):
     pass
