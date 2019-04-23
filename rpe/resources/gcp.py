@@ -74,6 +74,10 @@ class GoogleAPIResource(Resource):
             'compute.instances': GcpComputeInstance,
             'cloudresourcemanager.projects': GcpProject,
             'cloudresourcemanager.projects.iam': GcpProjectIam,
+            'pubsub.projects.subscriptions': GcpPubsubSubscription,
+            'pubsub.projects.subscriptions.iam': GcpPubsubSubscriptionIam,
+            'pubsub.projects.topics': GcpPubsubTopic,
+            'pubsub.projects.topics.iam': GcpPubsubTopicIam,
             'sqladmin.instances': GcpSqlInstance,
             'storage.buckets': GcpStorageBucket,
             'storage.buckets.iam': GcpStorageBucketIamPolicy
@@ -175,6 +179,115 @@ class GcpComputeInstance(GoogleAPIResource):
             'instance': self.resource_data['resource_name'],
             'zone': self.resource_data['resource_location'],
             'project': self.resource_data['project_id']
+        }
+
+
+class GcpPubsubSubscription(GoogleAPIResource):
+
+    service_name = "pubsub"
+    resource_path = "projects.subscriptions"
+    version = "v1"
+    update_method = "patch"
+
+    def _get_request_args(self):
+        return {
+            'subscription': 'projects/{}/subscriptions/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            )
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'name': 'projects/{}/subscriptions/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            ),
+            'body': {
+                'subscription': body,
+                'updateMask': 'labels,ack_deadline_seconds,push_config,message_retention_duration,retain_acked_messages,expiration_policy'
+            }
+        }
+
+
+class GcpPubsubSubscriptionIam(GcpPubsubSubscription):
+
+    resource_property = 'iam'
+    get_method = "getIamPolicy"
+    update_method = "setIamPolicy"
+
+    def _get_request_args(self):
+        return {
+            'resource': 'projects/{}/subscriptions/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            )
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'resource': 'projects/{}/subscriptions/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            ),
+            'body': {
+                'policy': body
+            }
+        }
+
+
+class GcpPubsubTopic(GoogleAPIResource):
+
+    service_name = "pubsub"
+    resource_path = "projects.topics"
+    version = "v1"
+    update_method = "patch"
+
+    def _get_request_args(self):
+        return {
+            'topic': 'projects/{}/topics/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            )
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'name': 'projects/{}/topics/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            ),
+            'body': {
+                'topic': body,
+                # the name field is immutable
+                'updateMask': 'labels'
+            }
+        }
+
+
+class GcpPubsubTopicIam(GcpPubsubTopic):
+
+    resource_property = "iam"
+    get_method = "getIamPolicy"
+    update_method = "setIamPolicy"
+
+    def _get_request_args(self):
+        return {
+            'resource': 'projects/{}/topics/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            )
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'resource': 'projects/{}/topics/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            ),
+            'body': {
+                'policy': body
+            }
         }
 
 
