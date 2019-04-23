@@ -1,4 +1,4 @@
-# Copyright 2019 The micromanager Authors. All rights reserved.
+# Copyright 2019 The resource-policy-evaluation-library Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 
 import pytest
 
-from micromanager.resources import Resource
-from micromanager.resources.gcp import GcpBigqueryDataset
-from micromanager.resources.gcp import GcpComputeInstance
-from micromanager.resources.gcp import GcpSqlInstance
-from micromanager.resources.gcp import GcpStorageBucket
-from micromanager.resources.gcp import GcpStorageBucketIamPolicy
+from rpe.resources import Resource
+from rpe.resources.gcp import GcpBigqueryDataset
+from rpe.resources.gcp import GcpComputeInstance
+from rpe.resources.gcp import GcpSqlInstance
+from rpe.resources.gcp import GcpStorageBucket
+from rpe.resources.gcp import GcpStorageBucketIamPolicy
 
 test_cases = [
     (

@@ -1,4 +1,4 @@
-# Copyright 2019 The micromanager Authors. All rights reserved.
+# Copyright 2019 The resource-policy-evaluation-library Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 
 from .base import Resource
-from micromanager.exceptions import is_retryable_exception
+from rpe.exceptions import is_retryable_exception
 import tenacity
 from googleapiclienthelpers.discovery import build_subresource
 from googleapiclienthelpers.waiter import Waiter

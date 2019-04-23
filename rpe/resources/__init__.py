@@ -1,4 +1,4 @@
-# Copyright 2019 The micromanager Authors. All rights reserved.
+# Copyright 2019 The resource-policy-evaluation-library Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,5 +13,4 @@
 # limitations under the License.
 
 
-from .opa import OpenPolicyAgent        # noqa: F401
-from .python import PythonPolicyEngine  # noqa: F401
+from .base import Resource    # noqa F401
