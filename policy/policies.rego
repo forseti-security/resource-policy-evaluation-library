@@ -15,12 +15,15 @@
 
 package policies
 
-list = array.concat(_resources, _resource_properties)
 
-_resources = [concat(".", [api, resource_type, policy]) |
-    data.gcp[api][resource_type].policy[policy]
-]
-
-_resource_properties = [concat(".", [api, resource_type, property, policy]) |
-    data.gcp[api][resource_type][property].policy[policy]
+# Find all defined policies
+#
+# We should move the policies to a separate path under data at some point and
+# limit our walking to that prefix
+list = [ concat(".", paths) |
+    x := walk(data.gcp)
+    paths := x[0]
+    is_array(paths)
+    count(paths) > 2
+    paths[count(paths) - 2] == "policy"
 ]
