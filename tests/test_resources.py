@@ -33,7 +33,8 @@ test_cases = [
             'project_id': test_project
         },
         GcpBigqueryDataset,
-        'gcp.bigquery.datasets'
+        'gcp.bigquery.datasets',
+        '//bigquery.googleapis.com/projects/my_project/datasets/my_resource'
     ),
     (
         {
@@ -43,7 +44,8 @@ test_cases = [
             'project_id': test_project
         },
         GcpComputeInstance,
-        'gcp.compute.instances'
+        'gcp.compute.instances',
+        '//compute.googleapis.com/projects/my_project/zones/us-central1-a/instances/my_resource'
     ),
     (
         {
@@ -52,7 +54,8 @@ test_cases = [
             'project_id': test_project
         },
         GcpSqlInstance,
-        'gcp.sqladmin.instances'
+        'gcp.sqladmin.instances',
+        '//sql.googleapis.com/projects/my_project/instances/my_resource'
     ),
     (
         {
@@ -61,7 +64,8 @@ test_cases = [
             'project_id': test_project
         },
         GcpStorageBucket,
-        'gcp.storage.buckets'
+        'gcp.storage.buckets',
+        '//storage.googleapis.com/buckets/my_resource'
     ),
     (
         {
@@ -70,15 +74,16 @@ test_cases = [
             'project_id': test_project
         },
         GcpStorageBucketIamPolicy,
-        'gcp.storage.buckets.iam'
+        'gcp.storage.buckets.iam',
+        '//storage.googleapis.com/buckets/my_resource'
     )
 ]
 
 
 @pytest.mark.parametrize(
     "input,cls,rtype",
-    test_cases,
-    ids=[cls.__name__ for (_, cls, _) in test_cases])
+    [(c[0], c[1], c[2]) for c in test_cases],
+    ids=[c[1].__name__ for c in test_cases])
 def test_gcp_resource_factory(input, cls, rtype):
     r = Resource.factory("gcp", input)
     assert r.__class__ == cls
@@ -88,3 +93,11 @@ def test_gcp_resource_factory(input, cls, rtype):
 def test_gcp_resource_factory_invalid():
     with pytest.raises(AssertionError):
         Resource.factory('gcp', {})
+
+@pytest.mark.parametrize(
+    "input,frn",
+    [(c[0], c[3]) for c in test_cases],
+    ids=[c[1].__name__ for c in test_cases])
+def test_gcp_full_resource_name(input, frn):
+    r = Resource.factory("gcp", input)
+    assert r.full_resource_name() == frn
