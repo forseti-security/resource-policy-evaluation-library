@@ -18,6 +18,12 @@ import pytest
 from rpe.resources import Resource
 from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpComputeInstance
+from rpe.resources.gcp import GcpProject
+from rpe.resources.gcp import GcpProjectIam
+from rpe.resources.gcp import GcpPubsubSubscription
+from rpe.resources.gcp import GcpPubsubSubscriptionIam
+from rpe.resources.gcp import GcpPubsubTopic
+from rpe.resources.gcp import GcpPubsubTopicIam
 from rpe.resources.gcp import GcpSqlInstance
 from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpStorageBucketIamPolicy
@@ -46,6 +52,66 @@ test_cases = [
         GcpComputeInstance,
         'gcp.compute.instances',
         '//compute.googleapis.com/projects/my_project/zones/us-central1-a/instances/my_resource'
+    ),
+    (
+        {
+            'resource_type': 'cloudresourcemanager.projects',
+            'resource_name': test_project,
+            'project_id': test_project
+        },
+        GcpProject,
+        'gcp.cloudresourcemanager.projects',
+        '//cloudresourcemanager.googleapis.com/projects/my_project'
+    ),
+    (
+        {
+            'resource_type': 'cloudresourcemanager.projects.iam',
+            'resource_name': test_project,
+            'project_id': test_project
+        },
+        GcpProjectIam,
+        'gcp.cloudresourcemanager.projects.iam',
+        '//cloudresourcemanager.googleapis.com/projects/my_project'
+    ),
+    (
+        {
+            'resource_type': 'pubsub.projects.subscriptions',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        GcpPubsubSubscription,
+        'gcp.pubsub.projects.subscriptions',
+        '//pubsub.googleapis.com/projects/my_project/subscriptions/my_resource'
+    ),
+    (
+        {
+            'resource_type': 'pubsub.projects.subscriptions.iam',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        GcpPubsubSubscriptionIam,
+        'gcp.pubsub.projects.subscriptions.iam',
+        '//pubsub.googleapis.com/projects/my_project/subscriptions/my_resource'
+    ),
+    (
+        {
+            'resource_type': 'pubsub.projects.topics',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        GcpPubsubTopic,
+        'gcp.pubsub.projects.topics',
+        '//pubsub.googleapis.com/projects/my_project/topics/my_resource'
+    ),
+    (
+        {
+            'resource_type': 'pubsub.projects.topics.iam',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        GcpPubsubTopicIam,
+        'gcp.pubsub.projects.topics.iam',
+        '//pubsub.googleapis.com/projects/my_project/topics/my_resource'
     ),
     (
         {
@@ -93,6 +159,7 @@ def test_gcp_resource_factory(input, cls, rtype):
 def test_gcp_resource_factory_invalid():
     with pytest.raises(AssertionError):
         Resource.factory('gcp', {})
+
 
 @pytest.mark.parametrize(
     "input,frn",
