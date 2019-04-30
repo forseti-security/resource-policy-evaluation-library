@@ -37,6 +37,11 @@ valid = true {
   data.exclusions.label_exclude(labels)
 }
 
+ # If this is a replica, you can't enable backups
+valid = true {
+  input.replicaConfiguration
+}
+
 #####
 # Remediation
 #####
