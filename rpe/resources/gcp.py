@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+from urllib.parse import urlparse
 from .base import Resource
 from rpe.exceptions import is_retryable_exception
 import tenacity
@@ -104,6 +105,49 @@ class GoogleAPIResource(Resource):
             type_components.append(self.resource_property)
 
         return ".".join(type_components)
+
+    # Google's documentation describes what it calls a 'full resource name' for
+    # resources. None of the API's seem to implement it (except Cloud Asset
+    # Inventory). This attempts to generate it from the discovery-based api
+    # client's generated http request url.
+    #
+    # If we inject it into the resource, we can use it in policy evaluation to
+    # simplify the structure of our policies
+    def full_resource_name(self):
+
+        # If this is a resource property, return the resource's frn instead
+        if self.is_property():
+            return self.parent_resource.full_resource_name()
+
+        method = getattr(self.service, self.get_method)
+        uri = method(**self._get_request_args()).uri
+
+        uri_parsed = urlparse(uri)
+        domain = uri_parsed.netloc
+        path_segments = uri_parsed.path[1:].split('/')
+
+        # First we need the name of the api
+        if domain.startswith("www."):
+            # we need to get the api name from the path
+            api_name = path_segments.pop(0)
+        else:
+            # the api name is the first segment of the domain
+            api_name = domain.split('.')[0]
+
+        # Remove the version from the path
+        path_segments.pop(0)
+
+        # Remove method from the last path segment
+        if ":" in path_segments[-1]:
+            path_segments[-1] = path_segments[-1].split(":")[0]
+
+        # Annoying resource-specific fixes
+        if api_name == 'storage' and path_segments[0] == 'b':
+            path_segments[0] = "buckets"
+
+        resource_path = "/".join(path_segments)
+
+        return "//{}.googleapis.com/{}".format(api_name, resource_path)
 
     def get(self):
         method = getattr(self.service, self.get_method)
