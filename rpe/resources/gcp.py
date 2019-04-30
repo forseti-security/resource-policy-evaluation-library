@@ -164,6 +164,8 @@ class GoogleAPIResource(Resource):
         else:
             asset = method(**self._get_request_args()).execute()
 
+        asset['_full_resource_name'] = self.full_resource_name()
+
         # if this asset is a property, inject its parent
         if self.is_property():
             parent = self.parent_resource.get()
@@ -178,8 +180,9 @@ class GoogleAPIResource(Resource):
     def update(self, body):
 
         # remove injected data before attempting update
-        if self.is_property() and '_resource' in body:
-            del body['_resource']
+        for key in body:
+            if key.startswith('_'):
+                del body[key]
 
         method = getattr(self.service, self.update_method)
         return method(**self._update_request_args(body)).execute()
