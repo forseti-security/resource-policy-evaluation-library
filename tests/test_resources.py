@@ -22,12 +22,15 @@ from rpe.resources.gcp import GcpSqlInstance
 from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpStorageBucketIamPolicy
 
+test_project = "my_project"
+test_resource_name = "my_resource"
+
 test_cases = [
     (
         {
             'resource_type': 'bigquery.datasets',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'project_id': test_project
         },
         GcpBigqueryDataset,
         'gcp.bigquery.datasets'
@@ -35,8 +38,9 @@ test_cases = [
     (
         {
             'resource_type': 'compute.instances',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
         },
         GcpComputeInstance,
         'gcp.compute.instances'
@@ -44,8 +48,8 @@ test_cases = [
     (
         {
             'resource_type': 'sqladmin.instances',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'project_id': test_project
         },
         GcpSqlInstance,
         'gcp.sqladmin.instances'
@@ -53,8 +57,8 @@ test_cases = [
     (
         {
             'resource_type': 'storage.buckets',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'project_id': test_project
         },
         GcpStorageBucket,
         'gcp.storage.buckets'
@@ -62,8 +66,8 @@ test_cases = [
     (
         {
             'resource_type': 'storage.buckets.iam',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'project_id': test_project
         },
         GcpStorageBucketIamPolicy,
         'gcp.storage.buckets.iam'
