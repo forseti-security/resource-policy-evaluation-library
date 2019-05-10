@@ -13,74 +13,161 @@
 # limitations under the License.
 
 
+import collections
 import pytest
 
 from rpe.resources import Resource
 from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpComputeInstance
+from rpe.resources.gcp import GcpProject
+from rpe.resources.gcp import GcpProjectIam
+from rpe.resources.gcp import GcpPubsubSubscription
+from rpe.resources.gcp import GcpPubsubSubscriptionIam
+from rpe.resources.gcp import GcpPubsubTopic
+from rpe.resources.gcp import GcpPubsubTopicIam
 from rpe.resources.gcp import GcpSqlInstance
 from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpStorageBucketIamPolicy
 
+test_project = "my_project"
+test_resource_name = "my_resource"
+
+ResourceTestCase = collections.namedtuple('ResourceTestCase', 'input cls type name')
+
 test_cases = [
-    (
-        {
+    ResourceTestCase(
+        input={
             'resource_type': 'bigquery.datasets',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'project_id': test_project
         },
-        GcpBigqueryDataset,
-        'gcp.bigquery.datasets'
+        cls=GcpBigqueryDataset,
+        type='gcp.bigquery.datasets',
+        name='//bigquery.googleapis.com/projects/my_project/datasets/my_resource'
     ),
-    (
-        {
+    ResourceTestCase(
+        input={
             'resource_type': 'compute.instances',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
         },
-        GcpComputeInstance,
-        'gcp.compute.instances'
+        cls=GcpComputeInstance,
+        type='gcp.compute.instances',
+        name='//compute.googleapis.com/projects/my_project/zones/us-central1-a/instances/my_resource'
     ),
-    (
-        {
+    ResourceTestCase(
+        input={
+            'resource_type': 'cloudresourcemanager.projects',
+            'resource_name': test_project,
+            'project_id': test_project
+        },
+        cls=GcpProject,
+        type='gcp.cloudresourcemanager.projects',
+        name='//cloudresourcemanager.googleapis.com/projects/my_project'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'cloudresourcemanager.projects.iam',
+            'resource_name': test_project,
+            'project_id': test_project
+        },
+        cls=GcpProjectIam,
+        type='gcp.cloudresourcemanager.projects.iam',
+        name='//cloudresourcemanager.googleapis.com/projects/my_project'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'pubsub.projects.subscriptions',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        cls=GcpPubsubSubscription,
+        type='gcp.pubsub.projects.subscriptions',
+        name='//pubsub.googleapis.com/projects/my_project/subscriptions/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'pubsub.projects.subscriptions.iam',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        cls=GcpPubsubSubscriptionIam,
+        type='gcp.pubsub.projects.subscriptions.iam',
+        name='//pubsub.googleapis.com/projects/my_project/subscriptions/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'pubsub.projects.topics',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        cls=GcpPubsubTopic,
+        type='gcp.pubsub.projects.topics',
+        name='//pubsub.googleapis.com/projects/my_project/topics/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'pubsub.projects.topics.iam',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        cls=GcpPubsubTopicIam,
+        type='gcp.pubsub.projects.topics.iam',
+        name='//pubsub.googleapis.com/projects/my_project/topics/my_resource'
+    ),
+    ResourceTestCase(
+        input={
             'resource_type': 'sqladmin.instances',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'project_id': test_project
         },
-        GcpSqlInstance,
-        'gcp.sqladmin.instances'
+        cls=GcpSqlInstance,
+        type='gcp.sqladmin.instances',
+        name='//sql.googleapis.com/projects/my_project/instances/my_resource'
     ),
-    (
-        {
+    ResourceTestCase(
+        input={
             'resource_type': 'storage.buckets',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'project_id': test_project
         },
-        GcpStorageBucket,
-        'gcp.storage.buckets'
+        cls=GcpStorageBucket,
+        type='gcp.storage.buckets',
+        name='//storage.googleapis.com/buckets/my_resource'
     ),
-    (
-        {
+    ResourceTestCase(
+        input={
             'resource_type': 'storage.buckets.iam',
-            'resource_name': '',
-            'project_id': ''
+            'resource_name': test_resource_name,
+            'project_id': test_project
         },
-        GcpStorageBucketIamPolicy,
-        'gcp.storage.buckets.iam'
+        cls=GcpStorageBucketIamPolicy,
+        type='gcp.storage.buckets.iam',
+        name='//storage.googleapis.com/buckets/my_resource'
     )
 ]
 
 
 @pytest.mark.parametrize(
-    "input,cls,rtype",
+    "case",
     test_cases,
-    ids=[cls.__name__ for (_, cls, _) in test_cases])
-def test_gcp_resource_factory(input, cls, rtype):
-    r = Resource.factory("gcp", input)
-    assert r.__class__ == cls
-    assert r.type() == rtype
+    ids=[case.cls.__name__ for case in test_cases])
+def test_gcp_resource_factory(case):
+    r = Resource.factory("gcp", case.input)
+    assert r.__class__ == case.cls
+    assert r.type() == case.type
 
 
 def test_gcp_resource_factory_invalid():
     with pytest.raises(AssertionError):
         Resource.factory('gcp', {})
+
+
+@pytest.mark.parametrize(
+    "case",
+    test_cases,
+    ids=[case.cls.__name__ for case in test_cases])
+def test_gcp_full_resource_name(case):
+    r = Resource.factory("gcp", case.input)
+    assert r.full_resource_name() == case.name
