@@ -134,6 +134,12 @@ class GoogleAPIResource(Resource):
             # the api name is the first segment of the domain
             api_name = domain.split('.')[0]
 
+            # occasionally the compute api baseUrl is returned as
+            # compute.googleapis.com/compute, in which case we need to remove
+            # the duplicated api reference
+            if api_name == path_segments[0]:
+                path_segments.pop(0)
+
         # Remove the version from the path
         path_segments.pop(0)
 
