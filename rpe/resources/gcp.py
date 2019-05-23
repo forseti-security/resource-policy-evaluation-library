@@ -186,7 +186,7 @@ class GoogleAPIResource(Resource):
     def update(self, body):
 
         # remove injected data before attempting update
-        for key in body:
+        for key in list(body):
             if key.startswith('_'):
                 del body[key]
 
