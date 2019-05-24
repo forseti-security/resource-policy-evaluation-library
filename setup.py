@@ -20,6 +20,7 @@ from setuptools import setup
 setup(
     name="rpe-lib",
     description="A resource policy evaluation library",
+    long_description=open('README.md').read(),
     author="Joe Ceresini",
     url="https://github.com/forseti-security/resource-policy-evaluation-library",
     use_scm_version=True,
