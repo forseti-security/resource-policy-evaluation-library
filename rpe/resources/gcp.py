@@ -419,7 +419,8 @@ class GcpProjectIam(GcpProject):
 
     def _get_request_args(self):
         return {
-            'resource': self.resource_data['resource_name']
+            'resource': self.resource_data['resource_name'],
+            'body': {}
         }
 
     def _update_request_args(self, body):
