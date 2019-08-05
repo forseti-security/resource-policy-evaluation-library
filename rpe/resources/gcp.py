@@ -82,7 +82,8 @@ class GoogleAPIResource(Resource):
             'serviceusage.services': GcpProjectService,
             'sqladmin.instances': GcpSqlInstance,
             'storage.buckets': GcpStorageBucket,
-            'storage.buckets.iam': GcpStorageBucketIamPolicy
+            'storage.buckets.iam': GcpStorageBucketIamPolicy,
+            'serviceusage.services': GcpProjectService
         }
 
         resource_type = resource_data.get('resource_type')
@@ -431,4 +432,18 @@ class GcpProjectIam(GcpProject):
                 'policy': body,
                 'updateMask': "bindings,etag,auditConfigs"
             }
+        }
+
+class GcpProjectService(GoogleAPIResource):
+
+    service_name = "serviceusage"
+    resource_path = "services"
+    version = "v1"
+
+    def _get_request_args(self):
+        return {
+            'resource': 'projects/{}/services/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            )
         }
