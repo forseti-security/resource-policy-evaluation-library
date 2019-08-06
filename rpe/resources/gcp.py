@@ -73,6 +73,9 @@ class GoogleAPIResource(Resource):
         resource_type_map = {
             'bigquery.datasets': GcpBigqueryDataset,
             'compute.instances': GcpComputeInstance,
+            'compute.subnetworks': GcpComputeSubnetwork,
+            'compute.subnetworks.privateip': GcpComputeSubnetworkPrivateip,
+            'compute.firewalls': GcpComputeFirewall,
             'cloudresourcemanager.projects': GcpProject,
             'cloudresourcemanager.projects.iam': GcpProjectIam,
             'pubsub.projects.subscriptions': GcpPubsubSubscription,
@@ -234,6 +237,52 @@ class GcpComputeInstance(GoogleAPIResource):
             'project': self.resource_data['project_id']
         }
 
+class GcpComputeSubnetwork(GoogleAPIResource):
+
+    service_name = "compute"
+    resource_path = "subnetworks"
+    version = "v1"
+    update_method = "patch"
+
+    def _get_request_args(self):
+        return {
+            'project': self.resource_data['project_id'],
+            'region': self.resource_data['resource_location'],
+            'subnetwork': self.resource_data['resource_name']
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'project': self.resource_data['project_id'],
+            'region': self.resource_data['resource_location'],
+            'subnetwork': self.resource_data['resource_name'],
+            'body': body
+        }
+
+class GcpComputeSubnetworkPrivateip(GcpComputeSubnetwork):
+
+    resource_property = 'privateip'
+    update_method = "setPrivateIpGoogleAccess"
+
+class GcpComputeFirewall(GoogleAPIResource):
+
+    service_name = "compute"
+    resource_path = "firewalls"
+    version = "v1"
+    update_method = "patch"
+
+    def _get_request_args(self):
+        return {
+            'firewall': self.resource_data['resource_name'],
+            'project': self.resource_data['project_id']
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'firewall': self.resource_data['resource_name'],
+            'project': self.resource_data['project_id'],
+            'body': body
+        }
 
 class GcpPubsubSubscription(GoogleAPIResource):
 
