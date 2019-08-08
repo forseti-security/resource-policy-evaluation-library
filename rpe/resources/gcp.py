@@ -16,6 +16,8 @@
 from urllib.parse import urlparse
 from .base import Resource
 from rpe.exceptions import is_retryable_exception
+from rpe.exceptions import UnsupportedRemediationSpec
+from rpe.exceptions import InvalidRemediationSpecStep
 import tenacity
 from googleapiclienthelpers.discovery import build_subresource
 from googleapiclienthelpers.waiter import Waiter
@@ -49,6 +51,9 @@ class GoogleAPIResource(Resource):
             self.version,
             **kwargs
         )
+
+        # Support original update method until we can deprecate it
+        self.update = self.remediate
 
         # If we are a property of a resource, also get the resource we're
         # associated with
@@ -178,20 +183,45 @@ class GoogleAPIResource(Resource):
             asset['_resource'] = parent
         return asset
 
+    # Determine what remediation steps to take, fall back to the original resource-defined update method
+    def remediate(self, remediation):
+        # Check for an update spec version, default to version 1
+        remediation_spec = remediation.get('_remediation_spec', "v1")
+        if remediation_spec == "v1":
+
+            # If no remediation_spec is listed, fall back to previous behavior
+            # We inject the _full_resource_name in requests, so we need to remove it
+            for key in list(remediation):
+                if key.startswith('_'):
+                    del remediation[key]
+
+            method_name = self.update_method
+            params = self._update_request_args(remediation)
+
+            self._call_method(method_name, params)
+
+        elif remediation_spec == "v2beta1":
+            required_keys = ['method', 'params']
+
+            for step in remediation.get('steps', []):
+                if not all(k in step for k in required_keys):
+                    raise InvalidRemediationSpecStep()
+
+                method_name = step.get('method')
+                params = step.get('params')
+                self._call_method(method_name, params)
+        else:
+            raise UnsupportedRemediationSpec("The specified remediation spec is not supported")
+
     @tenacity.retry(
         retry=tenacity.retry_if_exception(is_retryable_exception),
         wait=tenacity.wait_random_exponential(multiplier=1, max=10),
         stop=tenacity.stop_after_attempt(10)
     )
-    def update(self, body):
-
-        # remove injected data before attempting update
-        for key in list(body):
-            if key.startswith('_'):
-                del body[key]
-
-        method = getattr(self.service, self.update_method)
-        return method(**self._update_request_args(body)).execute()
+    def _call_method(self, method_name, params):
+        ''' Call the requested method on the resource '''
+        method = getattr(self.service, method_name)
+        return method(**params).execute()
 
 
 class GcpBigqueryDataset(GoogleAPIResource):
