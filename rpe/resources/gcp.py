@@ -82,8 +82,7 @@ class GoogleAPIResource(Resource):
             'serviceusage.services': GcpProjectService,
             'sqladmin.instances': GcpSqlInstance,
             'storage.buckets': GcpStorageBucket,
-            'storage.buckets.iam': GcpStorageBucketIamPolicy,
-            'serviceusage.services': GcpProjectService
+            'storage.buckets.iam': GcpStorageBucketIamPolicy
         }
 
         resource_type = resource_data.get('resource_type')
