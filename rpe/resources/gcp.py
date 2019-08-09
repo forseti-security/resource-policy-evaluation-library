@@ -79,6 +79,7 @@ class GoogleAPIResource(Resource):
             'pubsub.projects.subscriptions.iam': GcpPubsubSubscriptionIam,
             'pubsub.projects.topics': GcpPubsubTopic,
             'pubsub.projects.topics.iam': GcpPubsubTopicIam,
+            'serviceusage.services': GcpProjectService,
             'sqladmin.instances': GcpSqlInstance,
             'storage.buckets': GcpStorageBucket,
             'storage.buckets.iam': GcpStorageBucketIamPolicy
