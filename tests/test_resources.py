@@ -17,6 +17,7 @@ import collections
 import pytest
 
 from rpe.resources import Resource
+from rpe.resources.gcp import GcpAppEngineInstance
 from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpComputeInstance
 from rpe.resources.gcp import GcpProject
@@ -35,6 +36,18 @@ test_resource_name = "my_resource"
 ResourceTestCase = collections.namedtuple('ResourceTestCase', 'input cls type name')
 
 test_cases = [
+    ResourceTestCase(
+        input={
+            'resource_type': 'apps.services.versions.instances',
+            'appsId': test_project,
+            'servicesId': 'default',
+            'versionsId': test_resource_name,
+            'instancesId': test_resource_name,
+        },
+        cls=GcpAppEngineInstance,
+        type='gcp.appengine.apps.services.versions.instances',
+        name='//appengine.googleapis.com/apps/my_project/services/default/versions/my_resource/instances/my_resource'
+    ),
     ResourceTestCase(
         input={
             'resource_type': 'bigquery.datasets',
