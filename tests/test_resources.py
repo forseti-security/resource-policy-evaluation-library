@@ -21,6 +21,7 @@ from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpComputeInstance
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectIam
+from rpe.resources.gcp import GcpProjectService
 from rpe.resources.gcp import GcpPubsubSubscription
 from rpe.resources.gcp import GcpPubsubSubscriptionIam
 from rpe.resources.gcp import GcpPubsubTopic
@@ -75,6 +76,16 @@ test_cases = [
         cls=GcpProjectIam,
         type='gcp.cloudresourcemanager.projects.iam',
         name='//cloudresourcemanager.googleapis.com/projects/my_project'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'serviceusage.services',
+            'resource_name': 'compute.googleapis.com',
+            'project_id': test_project
+        },
+        cls=GcpProjectService,
+        type='gcp.serviceusage.services',
+        name='//serviceusage.googleapis.com/projects/my_project/services/compute.googleapis.com'
     ),
     ResourceTestCase(
         input={
