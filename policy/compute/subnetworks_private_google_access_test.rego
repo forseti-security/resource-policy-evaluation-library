@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-package gcp.compute.subnetworks.privateip.policy.private_ip_google_access
+package gcp.compute.subnetworks.policy.private_google_access
 
 test_valid_policies {
   valid with input as {
