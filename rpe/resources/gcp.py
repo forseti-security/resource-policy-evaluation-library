@@ -79,7 +79,6 @@ class GoogleAPIResource(Resource):
             'bigquery.datasets': GcpBigqueryDataset,
             'compute.instances': GcpComputeInstance,
             'compute.subnetworks': GcpComputeSubnetwork,
-            'compute.subnetworks.privateip': GcpComputeSubnetworkPrivateip,
             'compute.firewalls': GcpComputeFirewall,
             'cloudresourcemanager.projects': GcpProject,
             'cloudresourcemanager.projects.iam': GcpProjectIam,
@@ -289,10 +288,6 @@ class GcpComputeSubnetwork(GoogleAPIResource):
             'body': body
         }
 
-class GcpComputeSubnetworkPrivateip(GcpComputeSubnetwork):
-
-    resource_property = 'privateip'
-    update_method = "setPrivateIpGoogleAccess"
 
 class GcpComputeFirewall(GoogleAPIResource):
 

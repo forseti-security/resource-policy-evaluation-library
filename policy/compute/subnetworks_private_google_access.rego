@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-package gcp.compute.subnetworks.privateip.policy.private_ip_google_access
+package gcp.compute.subnetworks.policy.private_google_access
 
 #####
 # Resource metadata
@@ -41,14 +41,24 @@ valid = true {
 # Remediation
 #####
 
-# Make a copy of the input, omitting the privateIpGoogleAccess field
-remediate[key] = value {
-  key != "privateIpGoogleAccess"
-  input[key]=value
+remediate = {
+  "_remediation_spec": "v2beta1",
+  "steps": [
+    enable_private_google_access
+  ]
 }
 
-# Set the privateIpGoogleAccess field such that the subnetwork adheres to the policy
-remediate[key] = value {
-  key := "privateIpGoogleAccess"
-  value := true
+enable_private_google_access = {
+    "method": "setPrivateIpGoogleAccess",
+    "params": {
+        "subnetwork": input.name,
+        "region": selfLinkParts[8],
+        "project": selfLinkParts[6],
+        "body":  {
+            "privateIpGoogleAccess": true
+        }
+    }
 }
+
+# break out the selfLink so we can extract the project and region
+selfLinkParts = split(input.selfLink, "/")
