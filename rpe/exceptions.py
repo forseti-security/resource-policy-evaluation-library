@@ -41,3 +41,11 @@ class NoSuchEndpoint(URLError):
 
 class NoPossibleRemediation(Exception):
     pass
+
+
+class UnsupportedRemediationSpec(Exception):
+    pass
+
+
+class InvalidRemediationSpecStep(Exception):
+    pass
