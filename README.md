@@ -18,8 +18,8 @@ class MyResource:
     def get(self):
         pass
 
-    # Takes the body of a resource, and attempts to update the resource
-    def update(self, body):
+    # Takes a remediation spec and attempts to remediate a resource
+    def remediate(self, remediation):
         pass
 
     # Returns the resource type as a string

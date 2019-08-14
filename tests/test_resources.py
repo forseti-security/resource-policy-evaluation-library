@@ -19,6 +19,8 @@ import pytest
 from rpe.resources import Resource
 from rpe.resources.gcp import GcpAppEngineInstance
 from rpe.resources.gcp import GcpBigqueryDataset
+from rpe.resources.gcp import GcpCloudFunction
+from rpe.resources.gcp import GcpCloudFunctionIam
 from rpe.resources.gcp import GcpComputeInstance
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectIam
@@ -29,6 +31,8 @@ from rpe.resources.gcp import GcpPubsubTopicIam
 from rpe.resources.gcp import GcpSqlInstance
 from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpStorageBucketIamPolicy
+from rpe.resources.gcp import GcpComputeFirewall
+from rpe.resources.gcp import GcpComputeSubnetwork
 
 test_project = "my_project"
 test_resource_name = "my_resource"
@@ -55,6 +59,28 @@ test_cases = [
         cls=GcpBigqueryDataset,
         type='gcp.bigquery.datasets',
         name='//bigquery.googleapis.com/projects/my_project/datasets/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'cloudfunctions.projects.locations.functions',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpCloudFunction,
+        type='gcp.cloudfunctions.projects.locations.functions',
+        name='//cloudfunctions.googleapis.com/projects/my_project/locations/us-central1-a/functions/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'cloudfunctions.projects.locations.functions.iam',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpCloudFunctionIam,
+        type='gcp.cloudfunctions.projects.locations.functions.iam',
+        name='//cloudfunctions.googleapis.com/projects/my_project/locations/us-central1-a/functions/my_resource'
     ),
     ResourceTestCase(
         input={
@@ -156,6 +182,27 @@ test_cases = [
         cls=GcpStorageBucketIamPolicy,
         type='gcp.storage.buckets.iam',
         name='//storage.googleapis.com/buckets/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'compute.subnetworks',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1',
+            'project_id': test_project
+        },
+        cls=GcpComputeSubnetwork,
+        type='gcp.compute.subnetworks',
+        name='//compute.googleapis.com/projects/my_project/regions/us-central1/subnetworks/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'compute.firewalls',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        cls=GcpComputeFirewall,
+        type='gcp.compute.firewalls',
+        name='//compute.googleapis.com/projects/my_project/global/firewalls/my_resource'
     )
 ]
 
