@@ -27,9 +27,9 @@ labels = input.labels
 
 default valid = false
 
-# Check if default service account is used
+# Check if default service account is not used
 valid = true {
-  input.serviceAccountEmail == serviceAccountEmail
+  input.serviceAccountEmail != serviceAccountEmail
 }
 
 # Check for a global exclusion based on resource labels
@@ -43,7 +43,7 @@ valid = true {
 
 # Since we cannot remediate it, if policy fails lets end it with "No possible remediation"
 remediate[key] = value {
-  input.serviceAccountEmail == serviceAccountEmail
+  input.serviceAccountEmail != serviceAccountEmail
   input[key]=value
 }
 
