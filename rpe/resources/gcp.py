@@ -446,3 +446,6 @@ class GcpProjectService(GoogleAPIResource):
                 self.resource_data['resource_name']
             )
         }
+
+    def _update_request_args(self, body):
+        raise NotImplementedError("Update request not available")
