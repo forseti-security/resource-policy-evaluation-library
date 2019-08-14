@@ -19,6 +19,8 @@ import pytest
 from rpe.resources import Resource
 from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpComputeInstance
+from rpe.resources.gcp import GcpGkeCluster
+from rpe.resources.gcp import GcpGkeClusterNodepool
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectIam
 from rpe.resources.gcp import GcpPubsubSubscription
@@ -57,6 +59,28 @@ test_cases = [
         cls=GcpComputeInstance,
         type='gcp.compute.instances',
         name='//compute.googleapis.com/projects/my_project/zones/us-central1-a/instances/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'container.projects.locations.clusters',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpGkeCluster,
+        type='gcp.container.projects.locations.clusters',
+        name='//container.googleapis.com/projects/my_project/locations/us-central1-a/clusters/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'container.projects.locations.clusters.nodePools',
+            'resource_name': "parent_resource/nodePools/" + test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpGkeClusterNodepool,
+        type='gcp.container.projects.locations.clusters.nodePools',
+        name='//container.googleapis.com/projects/my_project/locations/us-central1-a/clusters/parent_resource/nodePools/my_resource'
     ),
     ResourceTestCase(
         input={
