@@ -76,6 +76,7 @@ class GoogleAPIResource(Resource):
     @staticmethod
     def factory(resource_data, **kargs):
         resource_type_map = {
+            'apps.services.versions.instances': GcpAppEngineInstance,
             'bigquery.datasets': GcpBigqueryDataset,
             'cloudfunctions.projects.locations.functions': GcpCloudFunction,
             'cloudfunctions.projects.locations.functions.iam': GcpCloudFunctionIam,
@@ -226,6 +227,30 @@ class GoogleAPIResource(Resource):
         ''' Call the requested method on the resource '''
         method = getattr(self.service, method_name)
         return method(**params).execute()
+
+class GcpAppEngineInstance(GoogleAPIResource):
+
+
+    service_name = "appengine"
+    resource_path = "apps.services.versions.instances"
+    version = "v1"
+    update_method = "debug"
+
+    def _get_request_args(self):
+        return {
+            'appsId': self.resource_data['resource_name'].split('/')[1],
+            'servicesId': self.resource_data['resource_name'].split('/')[3],
+            'versionsId': self.resource_data['resource_name'].split('/')[5],
+            'instancesId': self.resource_data['resource_name'].split('/')[-1]
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'appsId': self.resource_data['resource_name'].split('/')[1],
+            'servicesId': self.resource_data['resource_name'].split('/')[3],
+            'versionsId': self.resource_data['resource_name'].split('/')[5],
+            'instancesId': self.resource_data['resource_name'].split('/')[-1]
+        }
 
 
 class GcpBigqueryDataset(GoogleAPIResource):
@@ -473,7 +498,6 @@ class GcpPubsubTopicIam(GcpPubsubTopic):
                 'policy': body
             }
         }
-
 
 class GcpStorageBucket(GoogleAPIResource):
 
