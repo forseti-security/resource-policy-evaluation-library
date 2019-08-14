@@ -29,6 +29,8 @@ from rpe.resources.gcp import GcpPubsubTopicIam
 from rpe.resources.gcp import GcpSqlInstance
 from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpStorageBucketIamPolicy
+from rpe.resources.gcp import GcpComputeFirewall
+from rpe.resources.gcp import GcpComputeSubnetwork
 
 test_project = "my_project"
 test_resource_name = "my_resource"
@@ -156,6 +158,27 @@ test_cases = [
         cls=GcpStorageBucketIamPolicy,
         type='gcp.storage.buckets.iam',
         name='//storage.googleapis.com/buckets/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'compute.subnetworks',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1',
+            'project_id': test_project
+        },
+        cls=GcpComputeSubnetwork,
+        type='gcp.compute.subnetworks',
+        name='//compute.googleapis.com/projects/my_project/regions/us-central1/subnetworks/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'compute.firewalls',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        cls=GcpComputeFirewall,
+        type='gcp.compute.firewalls',
+        name='//compute.googleapis.com/projects/my_project/global/firewalls/my_resource'
     )
 ]
 

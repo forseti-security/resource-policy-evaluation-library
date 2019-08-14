@@ -42,7 +42,7 @@ class Resource(ABC):
         pass
 
     @abstractmethod
-    def update(self):
+    def remediate(self):
         pass
 
     @abstractmethod
