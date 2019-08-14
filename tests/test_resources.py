@@ -39,14 +39,12 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'apps.services.versions.instances',
-            'appsId': test_project,
-            'servicesId': 'default',
-            'versionsId': test_resource_name,
-            'instancesId': test_resource_name,
+            'resource_name': 'apps/my_project/services/default/versions/test-instance/instances/my_resource',
+            'project_id': test_project
         },
         cls=GcpAppEngineInstance,
         type='gcp.appengine.apps.services.versions.instances',
-        name='//appengine.googleapis.com/apps/my_project/services/default/versions/my_resource/instances/my_resource'
+        name='//appengine.googleapis.com/apps/my_project/services/default/versions/test-instance/instances/my_resource'
     ),
     ResourceTestCase(
         input={
