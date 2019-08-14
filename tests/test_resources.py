@@ -18,6 +18,8 @@ import pytest
 
 from rpe.resources import Resource
 from rpe.resources.gcp import GcpBigqueryDataset
+from rpe.resources.gcp import GcpCloudFunction
+from rpe.resources.gcp import GcpCloudFunctionIam
 from rpe.resources.gcp import GcpComputeInstance
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectIam
@@ -46,6 +48,28 @@ test_cases = [
         cls=GcpBigqueryDataset,
         type='gcp.bigquery.datasets',
         name='//bigquery.googleapis.com/projects/my_project/datasets/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'cloudfunctions.projects.locations.functions',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpCloudFunction,
+        type='gcp.cloudfunctions.projects.locations.functions',
+        name='//cloudfunctions.googleapis.com/projects/my_project/locations/us-central1-a/functions/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'cloudfunctions.projects.locations.functions.iam',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpCloudFunctionIam,
+        type='gcp.cloudfunctions.projects.locations.functions.iam',
+        name='//cloudfunctions.googleapis.com/projects/my_project/locations/us-central1-a/functions/my_resource'
     ),
     ResourceTestCase(
         input={
