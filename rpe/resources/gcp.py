@@ -515,7 +515,7 @@ class GcpProjectService(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'resource': 'projects/{}/services/{}'.format(
+            'name': 'projects/{}/services/{}'.format(
                 self.resource_data['project_id'],
                 self.resource_data['resource_name']
             )
