@@ -21,13 +21,11 @@ test_valid_policies {
    },
    "config": {
     "softwareConfig":{
-      "properties":[
-         {
+      "properties":{
             "dataproc:dataproc.logging.stackdriver.enable": "true",
             "dataproc:dataproc.logging.stackdriver.job.driver.enable": "true",
             "dataproc:jobs.file-backed-output.enable": "true"
-         }
-      ]
+      }
     }
    }
   }
@@ -40,13 +38,11 @@ test_valid_policies_with_override {
      },
      "config": {
       "softwareConfig":{
-        "properties":[
-           {
+        "properties":{
              "dataproc:dataproc.logging.stackdriver.enable": "true",
              "dataproc:dataproc.logging.stackdriver.job.driver.enable": "true",
              "dataproc:jobs.file-backed-output.enable": "true"
-           }
-        ]
+        }
       }
      }
   }
@@ -58,11 +54,9 @@ test_invalid_policies {
    },
    "config": {
     "softwareConfig":{
-      "properties":[
-         {
+      "properties":{
             "dataproc:dataproc.logging.stackdriver.enable": "true"
-         }
-      ]
+      }
     }
    }
   }
@@ -75,11 +69,9 @@ test_invalid_policies_with_override {
      },
      "config": {
       "softwareConfig":{
-        "properties":[
-           {
+        "properties":{
               "dataproc:dataproc.logging.stackdriver.enable": "true"
-           }
-        ]
+        }
       }
      }
   }

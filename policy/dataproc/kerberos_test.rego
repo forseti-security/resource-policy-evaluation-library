@@ -22,7 +22,7 @@ test_valid_policies {
    "config": {
     "securityConfig":{
       "kerberosConfig": {
-        "enableKerberos": "true"
+        "enableKerberos": true
       }
     }
    }
@@ -37,7 +37,7 @@ test_valid_policies_with_override {
      "config": {
        "securityConfig":{
          "kerberosConfig": {
-           "enableKerberos": "true"
+           "enableKerberos": true
          }
        }
      }
@@ -51,7 +51,7 @@ test_invalid_policies {
    "config": {
      "securityConfig":{
        "kerberosConfig": {
-         "enableKerberos": "false"
+         "enableKerberos": false
        }
      }
    }
@@ -66,7 +66,7 @@ test_invalid_policies_with_override {
      "config": {
        "securityConfig":{
          "kerberosConfig": {
-           "enableKerberos": "false"
+           "enableKerberos": false
          }
        }
      }
