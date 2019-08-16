@@ -29,7 +29,7 @@ default valid = false
 
 # Check if legacy ABAC is enabled
 valid = true {
-  input.legacyAbac.enabled == false
+  not input.legacyAbac.enabled
 }
 
 # Check for a global exclusion based on resource labels
@@ -44,11 +44,11 @@ valid = true {
 remediate = {
   "_remediation_spec": "v2beta1",
   "steps": [
-    enable_legacy_abac
+    disable_legacy_abac
   ]
 }
 
-enable_legacy_abac = {
+disable_legacy_abac = {
     "method": "setLegacyAbac",
     "params": {
         "name": combinedName,
