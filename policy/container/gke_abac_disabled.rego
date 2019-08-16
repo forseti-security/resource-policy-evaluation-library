@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-package gcp.container.projects.locations.clusters.policy.abac_enabled
+package gcp.container.projects.locations.clusters.policy.abac_disabled
 
 #####
 # Resource metadata
@@ -29,7 +29,7 @@ default valid = false
 
 # Check if legacy ABAC is enabled
 valid = true {
-  input.legacyAbac.enabled == true
+  input.legacyAbac.enabled == false
 }
 
 # Check for a global exclusion based on resource labels
@@ -54,7 +54,7 @@ enable_legacy_abac = {
         "name": combinedName,
         "body":  {
             "name": combinedName,
-            "enabled": true
+            "enabled": false
         }
     }
 }

@@ -13,14 +13,14 @@
 # limitations under the License.
 
 
-package gcp.container.projects.locations.clusters.policy.abac_enabled
+package gcp.container.projects.locations.clusters.policy.abac_disabled
 
 test_valid_policies {
   valid with input as {
     "labels": {
     },
     "legacyAbac": {
-      "enabled": true
+      "enabled": false
     }
   }
 }
@@ -31,7 +31,7 @@ test_valid_policies_with_override {
       "forseti-enforcer": "disable",
     },
     "legacyAbac": {
-      "enabled": true
+      "enabled": false
     }
   }
 }
@@ -39,7 +39,7 @@ test_valid_policies_with_override {
 test_valid_policies_missing_labels {
   valid with input as {
     "legacyAbac": {
-      "enabled": true
+      "enabled": false
     }
   }
 }
@@ -49,7 +49,7 @@ test_invalid_policies {
     "labels": {
     },
     "legacyAbac": {
-      "enabled": false
+      "enabled": true
     }
   }
 }
@@ -60,7 +60,7 @@ test_invalid_policies_with_override {
       "forseti-enforcer": "disable",
     },
     "legacyAbac": {
-      "enabled": false
+      "enabled": true
     }
   }
 }
@@ -68,7 +68,7 @@ test_invalid_policies_with_override {
 test_invalid_policies_missing_labels {
   not valid with input as {
     "legacyAbac": {
-      "enabled": false
+      "enabled": true
     }
   }
 }
