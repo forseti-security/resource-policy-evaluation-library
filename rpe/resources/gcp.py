@@ -76,7 +76,10 @@ class GoogleAPIResource(Resource):
     @staticmethod
     def factory(resource_data, **kargs):
         resource_type_map = {
+            'apps.services.versions.instances': GcpAppEngineInstance,
             'bigquery.datasets': GcpBigqueryDataset,
+            'cloudfunctions.projects.locations.functions': GcpCloudFunction,
+            'cloudfunctions.projects.locations.functions.iam': GcpCloudFunctionIam,
             'compute.instances': GcpComputeInstance,
             'compute.subnetworks': GcpComputeSubnetwork,
             'compute.firewalls': GcpComputeFirewall,
@@ -227,6 +230,30 @@ class GoogleAPIResource(Resource):
         method = getattr(self.service, method_name)
         return method(**params).execute()
 
+class GcpAppEngineInstance(GoogleAPIResource):
+
+
+    service_name = "appengine"
+    resource_path = "apps.services.versions.instances"
+    version = "v1"
+    update_method = "debug"
+
+    def _get_request_args(self):
+        return {
+            'appsId': self.resource_data['resource_name'].split('/')[1],
+            'servicesId': self.resource_data['resource_name'].split('/')[3],
+            'versionsId': self.resource_data['resource_name'].split('/')[5],
+            'instancesId': self.resource_data['resource_name'].split('/')[-1]
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'appsId': self.resource_data['resource_name'].split('/')[1],
+            'servicesId': self.resource_data['resource_name'].split('/')[3],
+            'versionsId': self.resource_data['resource_name'].split('/')[5],
+            'instancesId': self.resource_data['resource_name'].split('/')[-1]
+        }
+
 
 class GcpBigqueryDataset(GoogleAPIResource):
 
@@ -245,6 +272,61 @@ class GcpBigqueryDataset(GoogleAPIResource):
             'datasetId': self.resource_data['resource_name'],
             'projectId': self.resource_data['project_id'],
             'body': body
+        }
+
+
+class GcpCloudFunction(GoogleAPIResource):
+
+    service_name = "cloudfunctions"
+    resource_path = "projects.locations.functions"
+    version = "v1"
+    update_method = "patch"
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/locations/{}/functions/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_location'],
+                self.resource_data['resource_name']
+            ),
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'name': 'projects/{}/locations/{}/functions/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_location'],
+                self.resource_data['resource_name']
+            ),
+            'body': body
+        }
+
+
+class GcpCloudFunctionIam(GcpCloudFunction):
+
+    resource_property = 'iam'
+    get_method = "getIamPolicy"
+    update_method = "setIamPolicy"
+
+    def _get_request_args(self):
+        return {
+            'resource': 'projects/{}/locations/{}/functions/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_location'],
+                self.resource_data['resource_name']
+            ),
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'resource': 'projects/{}/locations/{}/functions/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_location'],
+                self.resource_data['resource_name']
+            ),
+            'body': {
+                'policy': body
+            }
         }
 
 
@@ -475,7 +557,6 @@ class GcpPubsubTopicIam(GcpPubsubTopic):
                 'policy': body
             }
         }
-
 
 class GcpStorageBucket(GoogleAPIResource):
 
