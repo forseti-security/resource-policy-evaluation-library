@@ -13,14 +13,15 @@
 # limitations under the License.
 
 
-package gcp.container.projects.locations.clusters.nodePools.policy.cos_image_used
+package gcp.container.projects.locations.clusters.nodePools.policy.auto_repair_upgrade_enabled
 
 test_valid_policies {
   valid with input as {
     "labels": {
     },
-    "config": {
-      "imageType": "COS"
+    "management": {
+      "autoRepair": true,
+      "autoUpgrade": true
     }
   }
 }
@@ -30,16 +31,18 @@ test_valid_policies_with_override {
     "labels": {
       "forseti-enforcer": "disable",
     },
-    "config": {
-      "imageType": "COS"
+    "management": {
+      "autoRepair": true,
+      "autoUpgrade": true
     }
   }
 }
 
 test_valid_policies_missing_labels {
   valid with input as {
-    "config": {
-      "imageType": "COS"
+    "management": {
+      "autoRepair": true,
+      "autoUpgrade": true
     }
   }
 }
@@ -48,8 +51,9 @@ test_invalid_policies {
   not valid with input as {
     "labels": {
     },
-    "config": {
-      "imageType": "UBUNTU"
+    "management": {
+      "autoRepair": false,
+      "autoUpgrade": false
     }
   }
 }
@@ -59,16 +63,18 @@ test_invalid_policies_with_override {
     "labels": {
       "forseti-enforcer": "disable",
     },
-    "config": {
-      "imageType": "UBUNTU"
+    "management": {
+      "autoRepair": false,
+      "autoUpgrade": false
     }
   }
 }
 
 test_invalid_policies_missing_labels {
   not valid with input as {
-    "config": {
-      "imageType": "UBUNTU"
+    "management": {
+      "autoRepair": false,
+      "autoUpgrade": false
     }
   }
 }

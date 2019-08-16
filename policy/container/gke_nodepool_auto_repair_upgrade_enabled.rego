@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-package gcp.container.projects.locations.clusters.nodePools.policy.cos_image_used
+package gcp.container.projects.locations.clusters.nodePools.policy.auto_repair_upgrade_enabled
 
 #####
 # Resource metadata
@@ -27,9 +27,10 @@ labels = input.labels
 
 default valid = false
 
-# Check if COS image is being used
+# Check if node autorepair is enabled
 valid = true {
-  input.config.imageType == "COS"
+  input.management.autoRepair == true
+  input.management.autoUpgrade == true
 }
 
 # Check for a global exclusion based on resource labels
@@ -41,40 +42,23 @@ valid = true {
 # Remediation
 #####
 
-# remediate[key] = value {
-#  key != "config"
-#  input[key]=value
-# }
-
-# remediate[key] = value {
-#  key := "config"
-#  value := _config
-# }
-
-# _config[key]=value{
-#   key != "imageType"
-#   input.config[key]=value
-# }
-
-# _config[key]=value{
-#   key := "imageType"
-#   value := "COS"
-# }
-
-
 remediate = {
   "_remediation_spec": "v2beta1",
   "steps": [
-    use_cos_image
+    enable_node_auto_repair_upgrade
   ]
 }
 
-use_cos_image = {
-    "method": "update",
+enable_node_auto_repair_upgrade = {
+    "method": "setManagement",
     "params": {
         "name": combinedName,
-        "body": {
-          "imageType": "COS"
+        "body":  {
+            "name": combinedName,
+            "management": {
+              "autoRepair": true,
+              "autoUpgrade": true
+            }
         }
     }
 }

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-package gcp.container.projects.locations.clusters.nodePools.policy.autoupgrade_enabled
+package gcp.container.projects.locations.clusters.policy.cos_image_used
 
 #####
 # Resource metadata
@@ -27,9 +27,10 @@ labels = input.labels
 
 default valid = false
 
-# Check if node autoupgrade is enabled
+# Check if COS image is being used
 valid = true {
-  input.management.autoUpgrade == true
+  invalid_nodepools := {nodepools | nodepools := input.nodePools[_].config; nodepools.imageType != "COS"}
+  count(invalid_nodepools) == 0
 }
 
 # Check for a global exclusion based on resource labels
@@ -44,19 +45,18 @@ valid = true {
 remediate = {
   "_remediation_spec": "v2beta1",
   "steps": [
-    enable_node_autoupgrade
+    use_cos_image
   ]
 }
 
-enable_node_autoupgrade = {
-    "method": "setManagement",
+use_cos_image = {
+    "method": "update",
     "params": {
         "name": combinedName,
-        "body":  {
-            "name": combinedName,
-            "management": {
-              "autoUpgrade": true
-            }
+        "body": {
+          "update": {
+            "desiredImageType": "COS"
+          }
         }
     }
 }
@@ -65,4 +65,4 @@ enable_node_autoupgrade = {
 selfLinkParts = split(input.selfLink, "/")
 
 # create combined resource name
-combinedName = sprintf("projects/%s/locations/%s/clusters/%s/nodePools/%s", [selfLinkParts[5], selfLinkParts[7], selfLinkParts[9], selfLinkParts[11]])
+combinedName = sprintf("projects/%s/locations/%s/clusters/%s", [selfLinkParts[5], selfLinkParts[7], selfLinkParts[9]])
