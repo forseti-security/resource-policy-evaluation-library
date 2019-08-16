@@ -29,7 +29,7 @@ default valid = false
 
 # Check if COS image is being used
 valid = true {
-  invalid_nodepools := {nodepools | nodepools := input.nodePools[_].config; nodepools.imageType != "COS"}
+  invalid_nodepools := [name | input.nodePools[p].config.imageType != "COS"; name := input.nodePools[p].name]
   count(invalid_nodepools) == 0
 }
 
@@ -44,22 +44,28 @@ valid = true {
 
 remediate = {
   "_remediation_spec": "v2beta1",
-  "steps": [
-    use_cos_image
-  ]
+  "steps": use_cos_image
 }
 
-use_cos_image = {
-    "method": "update",
-    "params": {
+# iterate steps over invalid nodePools (can be updated one at a time)
+use_cos_image = result {
+  result := { combined | combined := {
+      "method": "update",
+      "params": {
         "name": combinedName,
         "body": {
           "update": {
+            "desiredNodePoolId": _invalid_nodepools[_],
             "desiredImageType": "COS"
           }
         }
+      }
     }
+  }
 }
+
+# define list of nodePools using wrong image types
+_invalid_nodepools = invalid_nodepools { invalid_nodepools := [name | input.nodePools[p].config.imageType != "COS"; name := input.nodePools[p].name] }
 
 # break out the selfLink so we can extract the project, region, cluster and name
 selfLinkParts = split(input.selfLink, "/")
