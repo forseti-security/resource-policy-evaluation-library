@@ -22,6 +22,7 @@ from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpCloudFunction
 from rpe.resources.gcp import GcpCloudFunctionIam
 from rpe.resources.gcp import GcpComputeInstance
+from rpe.resources.gcp import GcpComputeDisks
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectIam
 from rpe.resources.gcp import GcpPubsubSubscription
@@ -93,6 +94,18 @@ test_cases = [
         type='gcp.compute.instances',
         name='//compute.googleapis.com/projects/my_project/zones/us-central1-a/instances/my_resource'
     ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'compute.disks',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpComputeDisks,
+        type='gcp.compute.disks',
+        name='//compute.googleapis.com/projects/my_project/zones/us-central1-a/disks/my_resource'
+    ),
+
     ResourceTestCase(
         input={
             'resource_type': 'cloudresourcemanager.projects',

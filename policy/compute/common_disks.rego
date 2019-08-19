@@ -13,10 +13,13 @@
 # limitations under the License.
 
 
----
-config:
-  exclusions:
-    labels:
-      forseti-enforcer: disable
-  instances:
-    harden_images_project: my-project-id
+package gcp.compute.disks
+
+policies [policy_name] {
+    policy := data.gcp.compute.disks.policy[policy_name]
+}
+
+violations [policy_name] {
+    policy := data.gcp.compute.disks.policy[policy_name]
+    policy.valid != true
+}
