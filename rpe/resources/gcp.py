@@ -91,6 +91,7 @@ class GoogleAPIResource(Resource):
             'pubsub.projects.subscriptions.iam': GcpPubsubSubscriptionIam,
             'pubsub.projects.topics': GcpPubsubTopic,
             'pubsub.projects.topics.iam': GcpPubsubTopicIam,
+            'serviceusage.services': GcpProjectService,
             'sqladmin.instances': GcpSqlInstance,
             'storage.buckets': GcpStorageBucket,
             'storage.buckets.iam': GcpStorageBucketIamPolicy
@@ -645,3 +646,20 @@ class GcpProjectIam(GcpProject):
                 'updateMask': "bindings,etag,auditConfigs"
             }
         }
+
+class GcpProjectService(GoogleAPIResource):
+
+    service_name = "serviceusage"
+    resource_path = "services"
+    version = "v1"
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/services/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            )
+        }
+
+    def _update_request_args(self, body):
+        raise NotImplementedError("Update request not available")
