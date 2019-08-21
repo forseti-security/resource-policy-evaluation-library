@@ -31,10 +31,7 @@ default valid = false
 
 # Check if hardened image used
 valid = true {
-    image_uri = split(input.config.masterConfig.imageUri,"/")
-
-    #check what project source was used for images
-    image_uri[6] == data.config.dataproc.harden_images_project
+    contains(input.config.masterConfig.imageUri, concat("/",["projects",data.config.dataproc.harden_images_project]))
 }
 
 # Check for a global exclusion based on resource labels
