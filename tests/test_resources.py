@@ -22,6 +22,7 @@ from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpCloudFunction
 from rpe.resources.gcp import GcpCloudFunctionIam
 from rpe.resources.gcp import GcpComputeInstance
+from rpe.resources.gcp import GcpDataprocCluster
 from rpe.resources.gcp import GcpGkeCluster
 from rpe.resources.gcp import GcpGkeClusterNodepool
 from rpe.resources.gcp import GcpProject
@@ -147,6 +148,17 @@ test_cases = [
         cls=GcpProjectService,
         type='gcp.serviceusage.services',
         name='//serviceusage.googleapis.com/projects/my_project/services/compute.googleapis.com'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'dataproc.clusters',
+            'resource_name': test_resource_name,
+            'resource_location': 'global',
+            'project_id': test_project
+        },
+        cls=GcpDataprocCluster,
+        type='gcp.dataproc.projects.regions.clusters',
+        name='//dataproc.googleapis.com/projects/my_project/regions/global/clusters/my_resource'
     ),
     ResourceTestCase(
         input={

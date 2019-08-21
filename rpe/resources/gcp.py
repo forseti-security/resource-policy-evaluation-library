@@ -87,6 +87,7 @@ class GoogleAPIResource(Resource):
             'container.projects.locations.clusters.nodePools': GcpGkeClusterNodepool,
             'cloudresourcemanager.projects': GcpProject,
             'cloudresourcemanager.projects.iam': GcpProjectIam,
+            'dataproc.clusters': GcpDataprocCluster,
             'pubsub.projects.subscriptions': GcpPubsubSubscription,
             'pubsub.projects.subscriptions.iam': GcpPubsubSubscriptionIam,
             'pubsub.projects.topics': GcpPubsubTopic,
@@ -395,6 +396,28 @@ class GcpComputeFirewall(GoogleAPIResource):
         }
 
 
+class GcpDataprocCluster(GoogleAPIResource):
+    service_name = "dataproc"
+    resource_path = "projects.regions.clusters"
+    update_method = "patch"
+    version = "v1beta2"
+
+    def _get_request_args(self):
+        return {
+            'projectId': self.resource_data['project_id'],
+            'region': self.resource_data['resource_location'],
+            'clusterName': self.resource_data['resource_name']
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'projectId': self.resource_data['project_id'],
+            'region': self.resource_data['resource_location'],
+            'clusterName': self.resource_data['resource_name']
+        }
+
+
+      
 class GcpGkeCluster(GoogleAPIResource):
 
     service_name = "container"

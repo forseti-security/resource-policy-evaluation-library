@@ -13,11 +13,35 @@
 # limitations under the License.
 
 
----
-config:
-  exclusions:
-    labels:
-      forseti-enforcer: disable
-  dataproc:
-    harden_images_project: my-project-id
-    cluster_max_age_ns: 5184000000000000
+package gcp.dataproc.projects.regions.clusters.policy.stackdriver_logging
+
+#####
+# Resource metadata
+#####
+
+labels = input.labels
+
+#####
+# Policy evaluation
+#####
+
+default valid = false
+
+valid = true {
+  input.config.softwareConfig.properties["dataproc:dataproc.logging.stackdriver.enable"] == "true"
+}
+
+# Check for a global exclusion based on resource labels
+valid = true {
+  data.exclusions.label_exclude(labels)
+}
+
+#####
+# Remediation
+#####
+
+# Since we cannot remediate it, if policy fails lets end it with "No possible remediation"
+remediate[key] = value {
+  false
+  input[key]=value
+}
