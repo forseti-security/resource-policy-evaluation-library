@@ -23,8 +23,11 @@ from rpe.resources.gcp import GcpCloudFunction
 from rpe.resources.gcp import GcpCloudFunctionIam
 from rpe.resources.gcp import GcpComputeInstance
 from rpe.resources.gcp import GcpDataprocCluster
+from rpe.resources.gcp import GcpGkeCluster
+from rpe.resources.gcp import GcpGkeClusterNodepool
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectIam
+from rpe.resources.gcp import GcpProjectService
 from rpe.resources.gcp import GcpPubsubSubscription
 from rpe.resources.gcp import GcpPubsubSubscriptionIam
 from rpe.resources.gcp import GcpPubsubTopic
@@ -96,6 +99,28 @@ test_cases = [
     ),
     ResourceTestCase(
         input={
+            'resource_type': 'container.projects.locations.clusters',
+            'resource_name': test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpGkeCluster,
+        type='gcp.container.projects.locations.clusters',
+        name='//container.googleapis.com/projects/my_project/locations/us-central1-a/clusters/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'container.projects.locations.clusters.nodePools',
+            'resource_name': "parent_resource/nodePools/" + test_resource_name,
+            'resource_location': 'us-central1-a',
+            'project_id': test_project
+        },
+        cls=GcpGkeClusterNodepool,
+        type='gcp.container.projects.locations.clusters.nodePools',
+        name='//container.googleapis.com/projects/my_project/locations/us-central1-a/clusters/parent_resource/nodePools/my_resource'
+    ),
+    ResourceTestCase(
+        input={
             'resource_type': 'cloudresourcemanager.projects',
             'resource_name': test_project,
             'project_id': test_project
@@ -113,6 +138,16 @@ test_cases = [
         cls=GcpProjectIam,
         type='gcp.cloudresourcemanager.projects.iam',
         name='//cloudresourcemanager.googleapis.com/projects/my_project'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'serviceusage.services',
+            'resource_name': 'compute.googleapis.com',
+            'project_id': test_project
+        },
+        cls=GcpProjectService,
+        type='gcp.serviceusage.services',
+        name='//serviceusage.googleapis.com/projects/my_project/services/compute.googleapis.com'
     ),
     ResourceTestCase(
         input={
