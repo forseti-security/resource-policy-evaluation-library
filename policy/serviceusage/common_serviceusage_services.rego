@@ -13,13 +13,13 @@
 # limitations under the License.
 
 
----
-config:
-  exclusions:
-    labels:
-      forseti-enforcer: disable
-  instances:
-    harden_images_project: my-project-id
-  dataproc:
-    harden_images_project: my-project-id
-    cluster_max_age_ns: 5184000000000000
+package gcp.serviceusage.services
+
+policies [policy_name] {
+    policy := data.gcp.serviceusage.services.policy[policy_name]
+}
+
+violations [policy_name] {
+    policy := data.gcp.serviceusage.services.policy[policy_name]
+    policy.valid != true
+}
