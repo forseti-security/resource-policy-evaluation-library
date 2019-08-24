@@ -81,6 +81,7 @@ class GoogleAPIResource(Resource):
             'cloudfunctions.projects.locations.functions': GcpCloudFunction,
             'cloudfunctions.projects.locations.functions.iam': GcpCloudFunctionIam,
             'compute.instances': GcpComputeInstance,
+            'compute.disks': GcpComputeDisks,
             'compute.subnetworks': GcpComputeSubnetwork,
             'compute.firewalls': GcpComputeFirewall,
             'container.projects.locations.clusters': GcpGkeCluster,
@@ -350,6 +351,26 @@ class GcpComputeInstance(GoogleAPIResource):
             'instance': self.resource_data['resource_name'],
             'zone': self.resource_data['resource_location'],
             'project': self.resource_data['project_id']
+        }
+
+class GcpComputeDisks(GoogleAPIResource):
+
+    service_name = "compute"
+    resource_path = "disks"
+    version = "v1"
+
+    def _get_request_args(self):
+        return {
+            'project': self.resource_data['project_id'],
+            'zone': self.resource_data['resource_location'],
+            'disk': self.resource_data['resource_name']
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'project': self.resource_data['project_id'],
+            'zone': self.resource_data['resource_location'],
+            'disk': self.resource_data['resource_name']
         }
 
 class GcpComputeSubnetwork(GoogleAPIResource):
