@@ -286,6 +286,8 @@ class GcpBigtableInstance(GoogleAPIResource):
     resource_path = "projects.instances"
     version = "v2"
     update_method = "partialUpdateInstance"
+    readiness_key = 'state'
+    readiness_value = 'READY'
 
     def _get_request_args(self):
         return {
@@ -311,6 +313,8 @@ class GcpBigtableInstanceIam(GcpBigtableInstance):
     resource_property = 'iam'
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
+    readiness_key = None
+    readiness_value = None
 
     def _get_request_args(self):
         return {
