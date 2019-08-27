@@ -285,6 +285,7 @@ class GcpBigtableInstance(GoogleAPIResource):
     service_name = "bigtableadmin"
     resource_path = "projects.instances"
     version = "v2"
+    update_method = "partialUpdateInstance"
 
     def _get_request_args(self):
         return {
@@ -300,7 +301,8 @@ class GcpBigtableInstance(GoogleAPIResource):
                 self.resource_data['project_id'],
                 self.resource_data['resource_name']
             ),
-            'body': body
+            'body': body,
+            'updateMask': 'labels,displayName,type'
         }
 
 
