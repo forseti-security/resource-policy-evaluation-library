@@ -180,7 +180,7 @@ class GoogleAPIResource(Resource):
                 self.readiness_key,
                 self.readiness_value,
                 interval=10,
-                retries=60
+                retries=90
             )
         else:
             asset = method(**self._get_request_args()).execute()
