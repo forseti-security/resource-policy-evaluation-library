@@ -182,7 +182,7 @@ class GoogleAPIResource(Resource):
                 self.readiness_key,
                 self.readiness_value,
                 interval=10,
-                retries=60
+                retries=90
             )
         else:
             asset = method(**self._get_request_args()).execute()
@@ -227,8 +227,8 @@ class GoogleAPIResource(Resource):
 
     @tenacity.retry(
         retry=tenacity.retry_if_exception(is_retryable_exception),
-        wait=tenacity.wait_random_exponential(multiplier=1, max=10),
-        stop=tenacity.stop_after_attempt(10)
+        wait=tenacity.wait_random_exponential(multiplier=5, max=20),
+        stop=tenacity.stop_after_attempt(15)
     )
     def _call_method(self, method_name, params):
         ''' Call the requested method on the resource '''
