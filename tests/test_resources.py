@@ -19,6 +19,8 @@ import pytest
 from rpe.resources import Resource
 from rpe.resources.gcp import GcpAppEngineInstance
 from rpe.resources.gcp import GcpBigqueryDataset
+from rpe.resources.gcp import GcpBigtableInstance
+from rpe.resources.gcp import GcpBigtableInstanceIam
 from rpe.resources.gcp import GcpCloudFunction
 from rpe.resources.gcp import GcpCloudFunctionIam
 from rpe.resources.gcp import GcpComputeInstance
@@ -64,6 +66,26 @@ test_cases = [
         cls=GcpBigqueryDataset,
         type='gcp.bigquery.datasets',
         name='//bigquery.googleapis.com/projects/my_project/datasets/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'bigtableadmin.projects.instances',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        cls=GcpBigtableInstance,
+        type='gcp.bigtableadmin.projects.instances',
+        name='//bigtableadmin.googleapis.com/projects/my_project/instances/my_resource'
+    ),
+    ResourceTestCase(
+        input={
+            'resource_type': 'bigtableadmin.projects.instances.iam',
+            'resource_name': test_resource_name,
+            'project_id': test_project
+        },
+        cls=GcpBigtableInstanceIam,
+        type='gcp.bigtableadmin.projects.instances.iam',
+        name='//bigtableadmin.googleapis.com/projects/my_project/instances/my_resource'
     ),
     ResourceTestCase(
         input={

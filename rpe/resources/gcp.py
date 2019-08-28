@@ -78,6 +78,8 @@ class GoogleAPIResource(Resource):
         resource_type_map = {
             'apps.services.versions.instances': GcpAppEngineInstance,
             'bigquery.datasets': GcpBigqueryDataset,
+            'bigtableadmin.projects.instances': GcpBigtableInstance,
+            'bigtableadmin.projects.instances.iam': GcpBigtableInstanceIam,
             'cloudfunctions.projects.locations.functions': GcpCloudFunction,
             'cloudfunctions.projects.locations.functions.iam': GcpCloudFunctionIam,
             'compute.instances': GcpComputeInstance,
@@ -275,6 +277,62 @@ class GcpBigqueryDataset(GoogleAPIResource):
             'datasetId': self.resource_data['resource_name'],
             'projectId': self.resource_data['project_id'],
             'body': body
+        }
+
+
+class GcpBigtableInstance(GoogleAPIResource):
+
+    service_name = "bigtableadmin"
+    resource_path = "projects.instances"
+    version = "v2"
+    update_method = "partialUpdateInstance"
+    readiness_key = 'state'
+    readiness_value = 'READY'
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/instances/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            ),
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'name': 'projects/{}/instances/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            ),
+            'body': body,
+            'updateMask': 'labels,displayName,type'
+        }
+
+
+class GcpBigtableInstanceIam(GcpBigtableInstance):
+
+    resource_property = 'iam'
+    get_method = "getIamPolicy"
+    update_method = "setIamPolicy"
+    readiness_key = None
+    readiness_value = None
+
+    def _get_request_args(self):
+        return {
+            'resource': 'projects/{}/instances/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            ),
+        }
+
+    def _update_request_args(self, body):
+        return {
+            'resource': 'projects/{}/instances/{}'.format(
+                self.resource_data['project_id'],
+                self.resource_data['resource_name']
+            ),
+            'body': {
+                'policy': body
+            }
         }
 
 
