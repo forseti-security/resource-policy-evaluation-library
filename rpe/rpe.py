@@ -54,7 +54,7 @@ class RPE:
     def policies(self, resource):
         '''Get all policies that apply to the given resource'''
         policies = []
-        for pe in self.policy_engine:
+        for pe in self.policy_engines:
             policies.extend(pe.policies(resource))
 
         return policies
