@@ -36,6 +36,7 @@ class RPE:
         self.policy_engines.append(engine)
 
     def get_configured_policies(self):
+        '''Get all configured policies across all engines'''
         policies = {}
         for pe in self.policy_engines:
             policies[str(pe)] = pe.configured_policies()
@@ -49,3 +50,11 @@ class RPE:
                 violations.append((pe, v))
 
         return violations
+
+    def policies(self, resource):
+        '''Get all policies that apply to the given resource'''
+        policies = []
+        for pe in self.policy_engine:
+            policies.extend(pe.policies(resource))
+
+        return policies
