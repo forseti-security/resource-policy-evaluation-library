@@ -243,6 +243,8 @@ class GcpAppEngineInstance(GoogleAPIResource):
     version = "v1"
     update_method = "debug"
 
+    cai_type = None             # unknown
+
     def _get_request_args(self):
         return {
             'appsId': self.resource_data['resource_name'].split('/')[1],
@@ -266,6 +268,8 @@ class GcpBigqueryDataset(GoogleAPIResource):
     resource_path = "datasets"
     version = "v2"
 
+    cai_type = "bigquery.googleapis.com/Dataset"
+
     def _get_request_args(self):
         return {
             'datasetId': self.resource_data['resource_name'],
@@ -288,6 +292,8 @@ class GcpBigtableInstance(GoogleAPIResource):
     update_method = "partialUpdateInstance"
     readiness_key = 'state'
     readiness_value = 'READY'
+
+    cai_type = "bigtableadmin.googleapis.com/Instance"
 
     def _get_request_args(self):
         return {
@@ -316,6 +322,8 @@ class GcpBigtableInstanceIam(GcpBigtableInstance):
     readiness_key = None
     readiness_value = None
 
+    cai_type = "bigtableadmin.googleapis.com/Instance"
+
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/instances/{}'.format(
@@ -343,6 +351,8 @@ class GcpCloudFunction(GoogleAPIResource):
     version = "v1"
     update_method = "patch"
 
+    cai_type = "cloudfunctions.googleapis.com/CloudFunction"  # unreleased
+
     def _get_request_args(self):
         return {
             'name': 'projects/{}/locations/{}/functions/{}'.format(
@@ -368,6 +378,8 @@ class GcpCloudFunctionIam(GcpCloudFunction):
     resource_property = 'iam'
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
+
+    cai_type = "cloudfunctions.googleapis.com/CloudFunction"  # unreleased
 
     def _get_request_args(self):
         return {
@@ -397,6 +409,8 @@ class GcpComputeInstance(GoogleAPIResource):
     resource_path = "instances"
     version = "v1"
 
+    cai_type = "compute.googleapis.com/Instance"
+
     def _get_request_args(self):
         return {
             'instance': self.resource_data['resource_name'],
@@ -411,11 +425,14 @@ class GcpComputeInstance(GoogleAPIResource):
             'project': self.resource_data['project_id']
         }
 
+
 class GcpComputeDisks(GoogleAPIResource):
 
     service_name = "compute"
     resource_path = "disks"
     version = "v1"
+
+    cai_type = "compute.googleapis.com/Disk"
 
     def _get_request_args(self):
         return {
@@ -437,6 +454,8 @@ class GcpComputeSubnetwork(GoogleAPIResource):
     resource_path = "subnetworks"
     version = "v1"
     update_method = "patch"
+
+    cai_type = "compute.googleapis.com/Subnetwork"
 
     def _get_request_args(self):
         return {
@@ -461,6 +480,8 @@ class GcpComputeFirewall(GoogleAPIResource):
     version = "v1"
     update_method = "patch"
 
+    cai_type = "compute.googleapis.com/Firewall"
+
     def _get_request_args(self):
         return {
             'firewall': self.resource_data['resource_name'],
@@ -481,6 +502,8 @@ class GcpDataprocCluster(GoogleAPIResource):
     update_method = "patch"
     version = "v1beta2"
 
+    cai_type = "dataproc.googleapis.com/Cluster"
+
     def _get_request_args(self):
         return {
             'projectId': self.resource_data['project_id'],
@@ -496,7 +519,6 @@ class GcpDataprocCluster(GoogleAPIResource):
         }
 
 
-      
 class GcpGkeCluster(GoogleAPIResource):
 
     service_name = "container"
@@ -504,6 +526,8 @@ class GcpGkeCluster(GoogleAPIResource):
     version = "v1"
     readiness_key = 'status'
     readiness_value = 'RUNNING'
+
+    cai_type = "container.googleapis.com/Cluster"
 
     def _get_request_args(self):
         return {
@@ -533,6 +557,8 @@ class GcpGkeClusterNodepool(GoogleAPIResource):
     readiness_key = 'status'
     readiness_value = 'RUNNING'
 
+    cai_type = "container.googleapis.com/NodePool"  # beta
+
     def _get_request_args(self):
         return {
             'name': 'projects/{}/locations/{}/clusters/{}'.format(
@@ -559,6 +585,8 @@ class GcpPubsubSubscription(GoogleAPIResource):
     resource_path = "projects.subscriptions"
     version = "v1"
     update_method = "patch"
+
+    cai_type = "pubsub.googleapis.com/Subscription"
 
     def _get_request_args(self):
         return {
@@ -587,6 +615,8 @@ class GcpPubsubSubscriptionIam(GcpPubsubSubscription):
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
+    cai_type = "pubsub.googleapis.com/Subscription"
+
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/subscriptions/{}'.format(
@@ -613,6 +643,8 @@ class GcpPubsubTopic(GoogleAPIResource):
     resource_path = "projects.topics"
     version = "v1"
     update_method = "patch"
+
+    cai_type = "pubsub.googleapis.com/Topic"
 
     def _get_request_args(self):
         return {
@@ -642,6 +674,8 @@ class GcpPubsubTopicIam(GcpPubsubTopic):
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
+    cai_type = "pubsub.googleapis.com/Topic"
+
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/topics/{}'.format(
@@ -661,11 +695,14 @@ class GcpPubsubTopicIam(GcpPubsubTopic):
             }
         }
 
+
 class GcpStorageBucket(GoogleAPIResource):
 
     service_name = "storage"
     resource_path = "buckets"
     version = "v1"
+
+    cai_type = "storage.googleapis.com/Bucket"
 
     def _get_request_args(self):
         return {
@@ -696,6 +733,8 @@ class GcpSqlInstance(GoogleAPIResource):
     readiness_key = 'state'
     readiness_value = 'RUNNABLE'
 
+    cai_type = "sqladmin.googleapis.com/Instance"
+
     def _get_request_args(self):
         return {
             'instance': self.resource_data['resource_name'],
@@ -715,6 +754,8 @@ class GcpProject(GoogleAPIResource):
     service_name = "cloudresourcemanager"
     resource_path = "projects"
     version = "v1"
+
+    cai_type = "cloudresourcemanager.googleapis.com/Project"  # beta
 
     def _get_request_args(self):
         return {
@@ -749,11 +790,14 @@ class GcpProjectIam(GcpProject):
             }
         }
 
+
 class GcpProjectService(GoogleAPIResource):
 
     service_name = "serviceusage"
     resource_path = "services"
     version = "v1"
+
+    cai_type = None
 
     def _get_request_args(self):
         return {
