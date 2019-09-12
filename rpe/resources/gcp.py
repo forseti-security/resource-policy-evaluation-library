@@ -22,6 +22,9 @@ import tenacity
 from googleapiclienthelpers.discovery import build_subresource
 from googleapiclienthelpers.waiter import Waiter
 
+# client for resource manager, will be lazy created later
+resource_manager_projects = None
+
 
 class GoogleAPIResource(Resource):
 
@@ -69,6 +72,7 @@ class GoogleAPIResource(Resource):
             )
 
         self.resource_data = resource_data
+        self._ancestry = None
 
     def is_property(self):
         return self.resource_property is not None
@@ -235,8 +239,27 @@ class GoogleAPIResource(Resource):
         method = getattr(self.service, method_name)
         return method(**params).execute()
 
-class GcpAppEngineInstance(GoogleAPIResource):
+    @property
+    def ancestry(self):
+        if self._ancestry:
+            return self._ancestry
 
+        # attempt to fill in the resource's ancestry
+
+        global resource_manager_projects
+        if resource_manager_projects is None:
+            resource_manager_projects = build_subresource(
+                'cloudresourcemanager.projects', 'v1',
+            )
+
+        self._ancestry = resource_manager_projects.getAncestry(
+            projectId=self.resource_data['project_id'],
+        ).execute()
+
+        return self._ancestry
+
+
+class GcpAppEngineInstance(GoogleAPIResource):
 
     service_name = "appengine"
     resource_path = "apps.services.versions.instances"
