@@ -35,8 +35,21 @@ valid = false {
  # Remediation
  #####
 
-  # Since we cannot remediate it, debug mode is read-only and its on the instance. Lets end it with "No possible remediation"
- remediate[key] = value {
-   input.vmDebugEnabled == false
-   input[key]=value
- }
+remediate = {
+  "_remediation_spec": "v2beta1",
+  "steps": [
+    delete_instance
+  ]
+}
+
+delete_instance = {
+    "method": "delete",
+    "params": {
+        "appsId": name_parts[1],
+        "servicesId": name_parts[3],
+        "versionsId": name_parts[5],
+        "instancesId": name_parts[7]
+    }
+}
+
+name_parts = split(input.name, "/")
