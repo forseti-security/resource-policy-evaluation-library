@@ -264,6 +264,8 @@ class GcpAppEngineInstance(GoogleAPIResource):
     service_name = "appengine"
     resource_path = "apps.services.versions.instances"
     version = "v1"
+    readiness_key = 'vmStatus'
+    readiness_value = 'RUNNING'
     update_method = "debug"
 
     cai_type = None             # unknown
