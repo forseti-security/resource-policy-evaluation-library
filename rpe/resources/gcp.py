@@ -55,6 +55,9 @@ class GoogleAPIResource(Resource):
             **kwargs
         )
 
+        # Store the extra kwargs in case we need to create new clients
+        self.kwargs = kwargs
+
         # Support original update method until we can deprecate it
         self.update = self.remediate
 
@@ -253,7 +256,7 @@ class GoogleAPIResource(Resource):
             )
 
         self._ancestry = resource_manager_projects.getAncestry(
-            projectId=self.resource_data['project_id'],
+            projectId=self.resource_data['project_id'], **self.kwargs
         ).execute()
 
         return self._ancestry
@@ -472,6 +475,7 @@ class GcpComputeDisks(GoogleAPIResource):
             'zone': self.resource_data['resource_location'],
             'disk': self.resource_data['resource_name']
         }
+
 
 class GcpComputeSubnetwork(GoogleAPIResource):
 
