@@ -252,11 +252,11 @@ class GoogleAPIResource(Resource):
         global resource_manager_projects
         if resource_manager_projects is None:
             resource_manager_projects = build_subresource(
-                'cloudresourcemanager.projects', 'v1',
+                'cloudresourcemanager.projects', 'v1', **self.kwargs
             )
 
         self._ancestry = resource_manager_projects.getAncestry(
-            projectId=self.resource_data['project_id'], **self.kwargs
+            projectId=self.resource_data['project_id']
         ).execute()
 
         return self._ancestry
