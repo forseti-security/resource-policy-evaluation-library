@@ -22,8 +22,10 @@ class Resource(ABC):
     def factory(platform, resource_data, **kargs):
         """ Return a resource from the appropriate platform """
         from .gcp import GoogleAPIResource
+        from .aws import AwsResource
 
         resource_platform_map = {
+            'aws': AwsResource,
             'gcp': GoogleAPIResource
         }
 

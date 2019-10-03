@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import datetime
 import json
 import tenacity
 
@@ -21,6 +22,10 @@ from urllib import request
 from rpe.exceptions import is_retryable_exception
 from rpe.exceptions import NoSuchEndpoint
 from rpe.exceptions import NoPossibleRemediation
+
+def json_handler(o):
+    if isinstance(o, datetime.datetime):
+        return o.__str__()
 
 
 class OpenPolicyAgent:
@@ -41,7 +46,7 @@ class OpenPolicyAgent:
         headers = {'Content-type': 'application/json'}
         req = request.Request(
             url,
-            data=json.dumps(data).encode('utf-8'),
+            data=json.dumps(data, default=json_handler).encode('utf-8'),
             method=method,
             headers=headers
         )
