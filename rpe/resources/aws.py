@@ -26,7 +26,9 @@ class AwsResource(Resource):
     def get(self):
         method = getattr(self.client, self.get_method)
         resp = method(**self._get_request_args())
-        return resp
+
+        # This is hard coded for instances because im being lazy
+        return resp.get('Reservations')[0].get('Instances')[0]
 
     def remediate(self):
         pass
