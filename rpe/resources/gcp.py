@@ -248,16 +248,20 @@ class GoogleAPIResource(Resource):
             return self._ancestry
 
         # attempt to fill in the resource's ancestry
+        # if the target project has the cloudresourcemanager api disabled, this will fail
+        try:
+            global resource_manager_projects
+            if resource_manager_projects is None:
+                resource_manager_projects = build_subresource(
+                    'cloudresourcemanager.projects', 'v1', **self.kwargs
+                )
 
-        global resource_manager_projects
-        if resource_manager_projects is None:
-            resource_manager_projects = build_subresource(
-                'cloudresourcemanager.projects', 'v1', **self.kwargs
-            )
-
-        self._ancestry = resource_manager_projects.getAncestry(
-            projectId=self.resource_data['project_id']
-        ).execute()
+            self._ancestry = resource_manager_projects.getAncestry(
+                projectId=self.resource_data['project_id']
+            ).execute()
+        except Exception:
+            # This call is best-effort. Any failures should be caught
+            pass
 
         return self._ancestry
 
