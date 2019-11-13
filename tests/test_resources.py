@@ -242,7 +242,7 @@ test_cases = [
         },
         cls=GcpSqlInstance,
         type='gcp.sqladmin.instances',
-        name='//sql.googleapis.com/projects/my_project/instances/my_resource'
+        name='//cloudsql.googleapis.com/projects/my_project/instances/my_resource'
     ),
     ResourceTestCase(
         input={

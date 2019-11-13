@@ -150,17 +150,30 @@ class GoogleAPIResource(Resource):
         domain = uri_parsed.netloc
         path_segments = uri_parsed.path[1:].split('/')
 
+        # CAI uses cloudsql.googleapis.com in their full_resource_name, so we need to detect all
+        # bad incarnations and replace them
+        bad_sql_names = ['sql', 'sqladmin']
+
         # First we need the name of the api
         if domain.startswith("www."):
             # we need to get the api name from the path
             api_name = path_segments.pop(0)
+            api_name = 'cloudsql' if api_name in bad_sql_names else api_name
         else:
             # the api name is the first segment of the domain
             api_name = domain.split('.')[0]
 
+            # the sql api is now returning sqladmin.googleapis.com/sql/<ver>
+            # and the CAI docs state the FRN for sql instances should start
+            # with //cloudsql.googleapis.com/ so lets replace all odd sql ones
+            # and rely on the code below to catch duplicates
+            path_segments[0] = 'cloudsql' if path_segments[0] in bad_sql_names else path_segments[0]
+            api_name = 'cloudsql' if api_name in bad_sql_names else api_name
+
             # occasionally the compute api baseUrl is returned as
             # compute.googleapis.com/compute, in which case we need to remove
             # the duplicated api reference
+            # also addresses the sql issue mentioned above
             if api_name == path_segments[0]:
                 path_segments.pop(0)
 
