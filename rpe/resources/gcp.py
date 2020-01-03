@@ -34,6 +34,8 @@ class GoogleAPIResource(Resource):
     get_method = "get"
     update_method = "update"
 
+    parent_cls = None
+
     # If a resource is not in a ready state, we can't update it. If we retrieve
     # it, and the state changes, updates will be rejected because the ETAG will
     # have changed. If a resource defines readiness criteria, the get() call
@@ -43,7 +45,12 @@ class GoogleAPIResource(Resource):
     readiness_key = None
     readiness_value = None
 
-    def __init__(self, resource_data, **kwargs):
+    def __init__(self, resource_name, resource_location=None, project_id=None, **kwargs):
+
+        self.resource_name = resource_name
+        self.resource_location = resource_location
+        self.project_id = project_id
+
         full_resource_path = "{}.{}".format(
             self.service_name,
             self.resource_path
@@ -61,20 +68,16 @@ class GoogleAPIResource(Resource):
         # Support original update method until we can deprecate it
         self.update = self.remediate
 
-        # If we are a property of a resource, also get the resource we're
-        # associated with
-        if self.is_property():
-            # Build resource data for the parent
-            parent_data = resource_data.copy()
-            parent_type = resource_data['resource_type'].rsplit('.', 1)[0]
-            parent_data['resource_type'] = parent_type
+        # If there is a parent class, retrieve that as well
+        if self.parent_cls:
 
-            self.parent_resource = GoogleAPIResource.factory(
-                parent_data,
+            self.parent_resource = self.parent_cls(
+                resource_name = self.resource_name,
+                resource_location = self.resource_location,
+                project_id = self.project_id,
                 **kwargs
             )
 
-        self.resource_data = resource_data
         self._ancestry = None
 
     def is_property(self):
@@ -115,8 +118,12 @@ class GoogleAPIResource(Resource):
         if resource_type not in resource_type_map:
             assert 0, 'Unrecognized resource'
 
+        resource_name = resource_data.get('resource_name')
+        resource_location = resource_data.get('resource_location')
+        project_id = resource_data.get('project_id')
+
         cls = resource_type_map.get(resource_type)
-        return cls(resource_data, **kargs)
+        return cls(resource_name=resource_name, resource_location=resource_location, project_id=project_id, **kargs)
 
     def type(self):
         type_components = ["gcp", self.service_name, self.resource_path]
@@ -270,7 +277,7 @@ class GoogleAPIResource(Resource):
                 )
 
             self._ancestry = resource_manager_projects.getAncestry(
-                projectId=self.resource_data['project_id']
+                projectId=self.project_id
             ).execute()
         except Exception:
             # This call is best-effort. Any failures should be caught
@@ -292,18 +299,18 @@ class GcpAppEngineInstance(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'appsId': self.resource_data['resource_name'].split('/')[1],
-            'servicesId': self.resource_data['resource_name'].split('/')[3],
-            'versionsId': self.resource_data['resource_name'].split('/')[5],
-            'instancesId': self.resource_data['resource_name'].split('/')[-1]
+            'appsId': self.resource_name.split('/')[1],
+            'servicesId': self.resource_name.split('/')[3],
+            'versionsId': self.resource_name.split('/')[5],
+            'instancesId': self.resource_name.split('/')[-1]
         }
 
     def _update_request_args(self, body):
         return {
-            'appsId': self.resource_data['resource_name'].split('/')[1],
-            'servicesId': self.resource_data['resource_name'].split('/')[3],
-            'versionsId': self.resource_data['resource_name'].split('/')[5],
-            'instancesId': self.resource_data['resource_name'].split('/')[-1]
+            'appsId': self.resource_name.split('/')[1],
+            'servicesId': self.resource_name.split('/')[3],
+            'versionsId': self.resource_name.split('/')[5],
+            'instancesId': self.resource_name.split('/')[-1]
         }
 
 
@@ -317,14 +324,14 @@ class GcpBigqueryDataset(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'datasetId': self.resource_data['resource_name'],
-            'projectId': self.resource_data['project_id']
+            'datasetId': self.resource_name,
+            'projectId': self.project_id
         }
 
     def _update_request_args(self, body):
         return {
-            'datasetId': self.resource_data['resource_name'],
-            'projectId': self.resource_data['project_id'],
+            'datasetId': self.resource_name,
+            'projectId': self.project_id,
             'body': body
         }
 
@@ -343,16 +350,16 @@ class GcpBigtableInstance(GoogleAPIResource):
     def _get_request_args(self):
         return {
             'name': 'projects/{}/instances/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             ),
         }
 
     def _update_request_args(self, body):
         return {
             'name': 'projects/{}/instances/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             ),
             'body': body,
             'updateMask': 'labels,displayName,type'
@@ -362,6 +369,7 @@ class GcpBigtableInstance(GoogleAPIResource):
 class GcpBigtableInstanceIam(GcpBigtableInstance):
 
     resource_property = 'iam'
+    parent_cls = GcpBigtableInstance
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
     readiness_key = None
@@ -372,16 +380,16 @@ class GcpBigtableInstanceIam(GcpBigtableInstance):
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/instances/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             ),
         }
 
     def _update_request_args(self, body):
         return {
             'resource': 'projects/{}/instances/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             ),
             'body': {
                 'policy': body
@@ -401,18 +409,18 @@ class GcpCloudFunction(GoogleAPIResource):
     def _get_request_args(self):
         return {
             'name': 'projects/{}/locations/{}/functions/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_location'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_location,
+                self.resource_name
             ),
         }
 
     def _update_request_args(self, body):
         return {
             'name': 'projects/{}/locations/{}/functions/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_location'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_location,
+                self.resource_name
             ),
             'body': body
         }
@@ -421,6 +429,7 @@ class GcpCloudFunction(GoogleAPIResource):
 class GcpCloudFunctionIam(GcpCloudFunction):
 
     resource_property = 'iam'
+    parent_cls = GcpCloudFunction
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
@@ -429,18 +438,18 @@ class GcpCloudFunctionIam(GcpCloudFunction):
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/locations/{}/functions/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_location'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_location,
+                self.resource_name
             ),
         }
 
     def _update_request_args(self, body):
         return {
             'resource': 'projects/{}/locations/{}/functions/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_location'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_location,
+                self.resource_name
             ),
             'body': {
                 'policy': body
@@ -458,16 +467,16 @@ class GcpComputeInstance(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'instance': self.resource_data['resource_name'],
-            'zone': self.resource_data['resource_location'],
-            'project': self.resource_data['project_id']
+            'instance': self.resource_name,
+            'zone': self.resource_location,
+            'project': self.project_id
         }
 
     def _update_request_args(self, body):
         return {
-            'instance': self.resource_data['resource_name'],
-            'zone': self.resource_data['resource_location'],
-            'project': self.resource_data['project_id']
+            'instance': self.resource_name,
+            'zone': self.resource_location,
+            'project': self.project_id
         }
 
 
@@ -481,16 +490,16 @@ class GcpComputeDisks(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'project': self.resource_data['project_id'],
-            'zone': self.resource_data['resource_location'],
-            'disk': self.resource_data['resource_name']
+            'project': self.project_id,
+            'zone': self.resource_location,
+            'disk': self.resource_name
         }
 
     def _update_request_args(self, body):
         return {
-            'project': self.resource_data['project_id'],
-            'zone': self.resource_data['resource_location'],
-            'disk': self.resource_data['resource_name']
+            'project': self.project_id,
+            'zone': self.resource_location,
+            'disk': self.resource_name
         }
 
 
@@ -505,16 +514,16 @@ class GcpComputeSubnetwork(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'project': self.resource_data['project_id'],
-            'region': self.resource_data['resource_location'],
-            'subnetwork': self.resource_data['resource_name']
+            'project': self.project_id,
+            'region': self.resource_location,
+            'subnetwork': self.resource_name
         }
 
     def _update_request_args(self, body):
         return {
-            'project': self.resource_data['project_id'],
-            'region': self.resource_data['resource_location'],
-            'subnetwork': self.resource_data['resource_name'],
+            'project': self.project_id,
+            'region': self.resource_location,
+            'subnetwork': self.resource_name,
             'body': body
         }
 
@@ -530,14 +539,14 @@ class GcpComputeFirewall(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'firewall': self.resource_data['resource_name'],
-            'project': self.resource_data['project_id']
+            'firewall': self.resource_name,
+            'project': self.project_id
         }
 
     def _update_request_args(self, body):
         return {
-            'firewall': self.resource_data['resource_name'],
-            'project': self.resource_data['project_id'],
+            'firewall': self.resource_name,
+            'project': self.project_id,
             'body': body
         }
 
@@ -552,16 +561,16 @@ class GcpDataprocCluster(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'projectId': self.resource_data['project_id'],
-            'region': self.resource_data['resource_location'],
-            'clusterName': self.resource_data['resource_name']
+            'projectId': self.project_id,
+            'region': self.resource_location,
+            'clusterName': self.resource_name
         }
 
     def _update_request_args(self, body):
         return {
-            'projectId': self.resource_data['project_id'],
-            'region': self.resource_data['resource_location'],
-            'clusterName': self.resource_data['resource_name']
+            'projectId': self.project_id,
+            'region': self.resource_location,
+            'clusterName': self.resource_name
         }
 
 
@@ -578,18 +587,18 @@ class GcpGkeCluster(GoogleAPIResource):
     def _get_request_args(self):
         return {
             'name': 'projects/{}/locations/{}/clusters/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_location'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_location,
+                self.resource_name
             )
         }
 
     def _update_request_args(self, body):
         return {
             'name': 'projects/{}/locations/{}/clusters/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_location'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_location,
+                self.resource_name
             ),
             'body': body
         }
@@ -608,18 +617,18 @@ class GcpGkeClusterNodepool(GoogleAPIResource):
     def _get_request_args(self):
         return {
             'name': 'projects/{}/locations/{}/clusters/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_location'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_location,
+                self.resource_name
             )
         }
 
     def _update_request_args(self, body):
         return {
             'name': 'projects/{}/locations/{}/clusters/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_location'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_location,
+                self.resource_name
             ),
             'body': body
         }
@@ -637,16 +646,16 @@ class GcpPubsubSubscription(GoogleAPIResource):
     def _get_request_args(self):
         return {
             'subscription': 'projects/{}/subscriptions/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             )
         }
 
     def _update_request_args(self, body):
         return {
             'name': 'projects/{}/subscriptions/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             ),
             'body': {
                 'subscription': body,
@@ -658,6 +667,7 @@ class GcpPubsubSubscription(GoogleAPIResource):
 class GcpPubsubSubscriptionIam(GcpPubsubSubscription):
 
     resource_property = 'iam'
+    parent_cls = GcpPubsubSubscription
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
@@ -666,16 +676,16 @@ class GcpPubsubSubscriptionIam(GcpPubsubSubscription):
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/subscriptions/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             )
         }
 
     def _update_request_args(self, body):
         return {
             'resource': 'projects/{}/subscriptions/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             ),
             'body': {
                 'policy': body
@@ -695,16 +705,16 @@ class GcpPubsubTopic(GoogleAPIResource):
     def _get_request_args(self):
         return {
             'topic': 'projects/{}/topics/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             )
         }
 
     def _update_request_args(self, body):
         return {
             'name': 'projects/{}/topics/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             ),
             'body': {
                 'topic': body,
@@ -717,6 +727,7 @@ class GcpPubsubTopic(GoogleAPIResource):
 class GcpPubsubTopicIam(GcpPubsubTopic):
 
     resource_property = "iam"
+    parent_cls = GcpPubsubTopic
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
@@ -725,16 +736,16 @@ class GcpPubsubTopicIam(GcpPubsubTopic):
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/topics/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             )
         }
 
     def _update_request_args(self, body):
         return {
             'resource': 'projects/{}/topics/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             ),
             'body': {
                 'policy': body
@@ -752,14 +763,14 @@ class GcpStorageBucket(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'bucket': self.resource_data['resource_name'],
-            'userProject': self.resource_data['project_id']
+            'bucket': self.resource_name,
+            'userProject': self.project_id
         }
 
     def _update_request_args(self, body):
         return {
-            'bucket': self.resource_data['resource_name'],
-            'userProject': self.resource_data['project_id'],
+            'bucket': self.resource_name,
+            'userProject': self.project_id,
             'body': body
         }
 
@@ -767,6 +778,7 @@ class GcpStorageBucket(GoogleAPIResource):
 class GcpStorageBucketIamPolicy(GcpStorageBucket):
 
     resource_property = "iam"
+    parent_cls = GcpStorageBucket
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
@@ -783,14 +795,14 @@ class GcpSqlInstance(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'instance': self.resource_data['resource_name'],
-            'project': self.resource_data['project_id']
+            'instance': self.resource_name,
+            'project': self.project_id
         }
 
     def _update_request_args(self, body):
         return {
-            'instance': self.resource_data['resource_name'],
-            'project': self.resource_data['project_id'],
+            'instance': self.resource_name,
+            'project': self.project_id,
             'body': body
         }
 
@@ -805,12 +817,12 @@ class GcpProject(GoogleAPIResource):
 
     def _get_request_args(self):
         return {
-            'projectId': self.resource_data['resource_name']
+            'projectId': self.resource_name
         }
 
     def _update_request_args(self, body):
         return {
-            'projectId': self.resource_data['resource_name'],
+            'projectId': self.resource_name,
             'body': body
         }
 
@@ -818,18 +830,19 @@ class GcpProject(GoogleAPIResource):
 class GcpProjectIam(GcpProject):
 
     resource_property = "iam"
+    parent_cls = GcpProject
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
     def _get_request_args(self):
         return {
-            'resource': self.resource_data['resource_name'],
+            'resource': self.resource_name,
             'body': {}
         }
 
     def _update_request_args(self, body):
         return {
-            'resource': self.resource_data['resource_name'],
+            'resource': self.resource_name,
             'body': {
                 'policy': body,
                 'updateMask': "bindings,etag,auditConfigs"
@@ -848,8 +861,8 @@ class GcpProjectService(GoogleAPIResource):
     def _get_request_args(self):
         return {
             'name': 'projects/{}/services/{}'.format(
-                self.resource_data['project_id'],
-                self.resource_data['resource_name']
+                self.project_id,
+                self.resource_name
             )
         }
 
