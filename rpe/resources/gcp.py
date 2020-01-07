@@ -13,9 +13,11 @@
 # limitations under the License.
 
 
+import re
 from urllib.parse import urlparse
 from .base import Resource
 from rpe.exceptions import is_retryable_exception
+from rpe.exceptions import ResourceException
 from rpe.exceptions import UnsupportedRemediationSpec
 from rpe.exceptions import InvalidRemediationSpecStep
 import tenacity
@@ -82,6 +84,100 @@ class GoogleAPIResource(Resource):
 
     def is_property(self):
         return self.resource_property is not None
+
+
+    @staticmethod
+    def _extract_cai_name_data(name):
+        ''' Attempt to get identifiable information out of resource_name '''
+
+        # Most resources need only a subset of these fields to query the google apis
+        fields = {
+            'project_id': r'/projects/([^\/]+)/',
+            'location': r'/(?:locations|regions|zones)/([^\/]+)/',
+            'name': r'([^\/]+)$',
+
+
+            # Less-common resource data
+            ## AppEngine
+            'app': r'/apps/([^\/]+)/',
+            'service': r'/services/([^\/]+)/',
+            'version': r'/versions/([^\/]+)/',
+
+            ## NodePools
+            'cluster': r'/clusters/([^\/]+)/',
+        }
+
+        resource_data = {}
+
+        # Extract available resource data from resource name
+        for field_name in fields:
+            m = re.search(fields[field_name], name)
+            if m:
+                resource_data[field_name] = m.group(1)
+
+        return resource_data
+
+
+    @staticmethod
+    def from_cai_data(resource_name, asset_type, content_type='resource', client_kwargs={}):
+
+        # CAI classifies things by content_type (ex: resource or iam)
+        # and asset_type (ex: storage bucket or container cluster)
+        cai_map = {
+            'resource': {
+
+                # App Engine instances show up as compute instances in CAI exports. We've chosen to
+                # define our own asset_type and do some munging outside of rpelib
+                'appengine.googleapis.com/Instance': GcpAppEngineInstance,
+
+                'bigquery.googleapis.com/Dataset': GcpBigqueryDataset,
+                'bigtableadmin.googleapis.com/Instance': GcpBigtableInstance,
+
+                # Cloudfunctions are not currently supported by CAI. We reached out to the CAI team
+                # to find out what the asset_type would likely be
+                'cloudfunctions.googleapis.com/CloudFunction': GcpCloudFunction,
+
+                'compute.googleapis.com/Instance': GcpComputeInstance,
+                'compute.googleapis.com/Disk': GcpComputeDisks,
+                'compute.googleapis.com/Subnetwork': GcpComputeSubnetwork,
+                'compute.googleapis.com/Firewall': GcpComputeFirewall,
+                'dataproc.googleapis.com/Cluster': GcpDataprocCluster,
+                'container.googleapis.com/Cluster': GcpGkeCluster,
+                'container.googleapis.com/NodePool': GcpGkeClusterNodepool,
+                'pubsub.googleapis.com/Subscription': GcpPubsubSubscription,
+                'pubsub.googleapis.com/Topic': GcpPubsubTopic,
+                'storage.googleapis.com/Bucket': GcpStorageBucket,
+                'sqladmin.googleapis.com/Instance': GcpSqlInstance,
+                'cloudresourcemanager.googleapis.com/Project': GcpProject,
+                'serviceusage.googleapis.com/Service': GcpProjectService,
+            },
+            'iam': {
+                "bigtableadmin.googleapis.com/Instance": GcpBigtableInstanceIam,
+                "cloudfunctions.googleapis.com/CloudFunction": GcpCloudFunctionIam,
+                "pubsub.googleapis.com/Subscription": GcpPubsubSubscriptionIam,
+                "pubsub.googleapis.com/Topic": GcpPubsubTopicIam,
+                "storage.googleapis.com/Bucket": GcpStorageBucketIamPolicy,
+                "cloudresourcemanager.googleapis.com/Project": GcpProjectIam,
+            }
+        }
+
+        if content_type not in cai_map:
+            raise ResourceException('Unrecognized content type: {}'.format(content_type))
+
+        asset_type_map = cai_map.get(content_type)
+
+        if asset_type not in asset_type_map:
+            raise ResourceException('Unrecognized asset type: {}'.format(asset_type))
+
+        cls = asset_type_map.get(asset_type)
+
+        resource_data = GoogleAPIResource._extract_cai_name_data(resource_name)
+
+        return cls(
+            client_kwargs=client_kwargs,
+            **resource_data
+        )
+
 
     @staticmethod
     def factory(resource_data, **kargs):
