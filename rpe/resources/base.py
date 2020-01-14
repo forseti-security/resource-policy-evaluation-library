@@ -19,7 +19,7 @@ from abc import ABC, abstractmethod
 class Resource(ABC):
 
     @staticmethod
-    def factory(platform, resource_data, **kargs):
+    def factory(platform, **kargs):
         """ Return a resource from the appropriate platform """
         from .gcp import GoogleAPIResource
 
@@ -29,7 +29,6 @@ class Resource(ABC):
 
         try:
             resource = resource_platform_map[platform].factory(
-                resource_data,
                 **kargs
             )
         except KeyError:

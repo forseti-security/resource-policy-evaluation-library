@@ -16,6 +16,9 @@
 import collections
 import pytest
 
+from google.oauth2.credentials import Credentials
+
+from rpe.exceptions import ResourceException
 from rpe.resources import Resource
 from rpe.resources.gcp import GcpAppEngineInstance
 from rpe.resources.gcp import GcpBigqueryDataset
@@ -43,6 +46,9 @@ from rpe.resources.gcp import GcpComputeSubnetwork
 
 test_project = "my_project"
 test_resource_name = "my_resource"
+client_kwargs = {
+    'credentials': Credentials(token='')
+}
 
 ResourceTestCase = collections.namedtuple('ResourceTestCase', 'input cls type name')
 
@@ -50,17 +56,20 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'apps.services.versions.instances',
-            'resource_name': 'apps/my_project/services/default/versions/test-instance/instances/my_resource',
-            'project_id': test_project
+            'name': 'my_resource',
+            'app': 'my_project',
+            'service': 'default',
+            'version': '0123456789',
+            'project_id': test_project,
         },
         cls=GcpAppEngineInstance,
         type='gcp.appengine.apps.services.versions.instances',
-        name='//appengine.googleapis.com/apps/my_project/services/default/versions/test-instance/instances/my_resource'
+        name='//appengine.googleapis.com/apps/my_project/services/default/versions/0123456789/instances/my_resource'
     ),
     ResourceTestCase(
         input={
             'resource_type': 'bigquery.datasets',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpBigqueryDataset,
@@ -70,7 +79,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'bigtableadmin.projects.instances',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpBigtableInstance,
@@ -80,7 +89,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'bigtableadmin.projects.instances.iam',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpBigtableInstanceIam,
@@ -90,8 +99,8 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'cloudfunctions.projects.locations.functions',
-            'resource_name': test_resource_name,
-            'resource_location': 'us-central1-a',
+            'name': test_resource_name,
+            'location': 'us-central1-a',
             'project_id': test_project
         },
         cls=GcpCloudFunction,
@@ -101,8 +110,8 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'cloudfunctions.projects.locations.functions.iam',
-            'resource_name': test_resource_name,
-            'resource_location': 'us-central1-a',
+            'name': test_resource_name,
+            'location': 'us-central1-a',
             'project_id': test_project
         },
         cls=GcpCloudFunctionIam,
@@ -112,8 +121,8 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'compute.disks',
-            'resource_name': test_resource_name,
-            'resource_location': 'us-central1-a',
+            'name': test_resource_name,
+            'location': 'us-central1-a',
             'project_id': test_project
         },
         cls=GcpComputeDisks,
@@ -123,8 +132,8 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'compute.instances',
-            'resource_name': test_resource_name,
-            'resource_location': 'us-central1-a',
+            'name': test_resource_name,
+            'location': 'us-central1-a',
             'project_id': test_project
         },
         cls=GcpComputeInstance,
@@ -134,8 +143,8 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'container.projects.locations.clusters',
-            'resource_name': test_resource_name,
-            'resource_location': 'us-central1-a',
+            'name': test_resource_name,
+            'location': 'us-central1-a',
             'project_id': test_project
         },
         cls=GcpGkeCluster,
@@ -145,8 +154,9 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'container.projects.locations.clusters.nodePools',
-            'resource_name': "parent_resource/nodePools/" + test_resource_name,
-            'resource_location': 'us-central1-a',
+            'name': test_resource_name,
+            'location': 'us-central1-a',
+            'cluster': 'parent_resource',
             'project_id': test_project
         },
         cls=GcpGkeClusterNodepool,
@@ -156,7 +166,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'cloudresourcemanager.projects',
-            'resource_name': test_project,
+            'name': test_project,
             'project_id': test_project
         },
         cls=GcpProject,
@@ -166,7 +176,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'cloudresourcemanager.projects.iam',
-            'resource_name': test_project,
+            'name': test_project,
             'project_id': test_project
         },
         cls=GcpProjectIam,
@@ -176,7 +186,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'serviceusage.services',
-            'resource_name': 'compute.googleapis.com',
+            'name': 'compute.googleapis.com',
             'project_id': test_project
         },
         cls=GcpProjectService,
@@ -186,8 +196,8 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'dataproc.clusters',
-            'resource_name': test_resource_name,
-            'resource_location': 'global',
+            'name': test_resource_name,
+            'location': 'global',
             'project_id': test_project
         },
         cls=GcpDataprocCluster,
@@ -197,7 +207,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'pubsub.projects.subscriptions',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpPubsubSubscription,
@@ -207,7 +217,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'pubsub.projects.subscriptions.iam',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpPubsubSubscriptionIam,
@@ -217,7 +227,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'pubsub.projects.topics',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpPubsubTopic,
@@ -227,7 +237,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'pubsub.projects.topics.iam',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpPubsubTopicIam,
@@ -237,7 +247,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'sqladmin.instances',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpSqlInstance,
@@ -247,7 +257,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'storage.buckets',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpStorageBucket,
@@ -257,7 +267,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'storage.buckets.iam',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpStorageBucketIamPolicy,
@@ -267,8 +277,8 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'compute.subnetworks',
-            'resource_name': test_resource_name,
-            'resource_location': 'us-central1',
+            'name': test_resource_name,
+            'location': 'us-central1',
             'project_id': test_project
         },
         cls=GcpComputeSubnetwork,
@@ -278,7 +288,7 @@ test_cases = [
     ResourceTestCase(
         input={
             'resource_type': 'compute.firewalls',
-            'resource_name': test_resource_name,
+            'name': test_resource_name,
             'project_id': test_project
         },
         cls=GcpComputeFirewall,
@@ -293,14 +303,14 @@ test_cases = [
     test_cases,
     ids=[case.cls.__name__ for case in test_cases])
 def test_gcp_resource_factory(case):
-    r = Resource.factory("gcp", case.input)
+    r = Resource.factory("gcp", **case.input, client_kwargs=client_kwargs)
     assert r.__class__ == case.cls
     assert r.type() == case.type
 
 
 def test_gcp_resource_factory_invalid():
-    with pytest.raises(AssertionError):
-        Resource.factory('gcp', {})
+    with pytest.raises(ResourceException):
+        Resource.factory('gcp')
 
 
 @pytest.mark.parametrize(
@@ -308,5 +318,5 @@ def test_gcp_resource_factory_invalid():
     test_cases,
     ids=[case.cls.__name__ for case in test_cases])
 def test_gcp_full_resource_name(case):
-    r = Resource.factory("gcp", case.input)
+    r = Resource.factory("gcp", **case.input, client_kwargs=client_kwargs)
     assert r.full_resource_name() == case.name
