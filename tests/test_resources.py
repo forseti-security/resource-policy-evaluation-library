@@ -303,7 +303,7 @@ test_cases = [
     test_cases,
     ids=[case.cls.__name__ for case in test_cases])
 def test_gcp_resource_factory(case):
-    r = Resource.factory("gcp", **case.input, client_kwargs=client_kwargs)
+    r = Resource.factory("gcp", client_kwargs=client_kwargs, **case.input)
     assert r.__class__ == case.cls
     assert r.type() == case.type
 
@@ -318,5 +318,5 @@ def test_gcp_resource_factory_invalid():
     test_cases,
     ids=[case.cls.__name__ for case in test_cases])
 def test_gcp_full_resource_name(case):
-    r = Resource.factory("gcp", **case.input, client_kwargs=client_kwargs)
+    r = Resource.factory("gcp", client_kwargs=client_kwargs, **case.input)
     assert r.full_resource_name() == case.name
