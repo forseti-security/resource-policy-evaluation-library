@@ -912,20 +912,18 @@ class GcpStorageBucket(GoogleAPIResource):
     resource_path = "buckets"
     version = "v1"
 
-    required_resource_data = ['name', 'project_id']
+    required_resource_data = ['name']
 
     cai_type = "storage.googleapis.com/Bucket"
 
     def _get_request_args(self):
         return {
             'bucket': self.resource.name,
-            'userProject': self.resource.project_id
         }
 
     def _update_request_args(self, body):
         return {
             'bucket': self.resource.name,
-            'userProject': self.resource.project_id,
             'body': body
         }
 
