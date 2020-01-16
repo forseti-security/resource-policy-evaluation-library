@@ -248,3 +248,4 @@ def test_gcp_resource_from_cai_data(case):
         client_kwargs=client_kwargs,
     )
     assert r.__class__ == case.resource_cls
+    assert r.full_resource_name() == case.data.get('name')
