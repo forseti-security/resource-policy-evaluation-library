@@ -46,6 +46,9 @@ class NoPossibleRemediation(Exception):
     pass
 
 
+class ResourceException(Exception):
+    pass
+
 class UnsupportedRemediationSpec(Exception):
     pass
 
