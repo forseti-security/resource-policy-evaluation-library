@@ -317,8 +317,21 @@ class GoogleAPIResource(Resource):
             path_segments[-1] = path_segments[-1].split(":")[0]
 
         # Annoying resource-specific fixes
+
+        # The url for buckets is `/b/` instead of `/buckets/`. Initially this fixed that
+        # Unfortunately, CAI omits the collection name, rather than follow Google's API design doc
+        # So we just remove the collection name
+        #
+        # https://cloud.google.com/apis/design/resource_names
+        # See: https://issuetracker.google.com/issues/131586763
+        #
         if api_name == 'storage' and path_segments[0] == 'b':
-            path_segments[0] = "buckets"
+            path_segments.pop(0)
+            # Replace with this if they fix CAI:
+            # path_segments[0] = "buckets"
+
+        if api_name == 'bigtableadmin':
+            api_name = 'bigtable'
 
         resource_path = "/".join(path_segments)
 

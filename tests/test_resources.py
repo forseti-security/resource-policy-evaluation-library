@@ -84,7 +84,7 @@ test_cases = [
         },
         cls=GcpBigtableInstance,
         type='gcp.bigtableadmin.projects.instances',
-        name='//bigtableadmin.googleapis.com/projects/my_project/instances/my_resource'
+        name='//bigtable.googleapis.com/projects/my_project/instances/my_resource'
     ),
     ResourceTestCase(
         input={
@@ -94,7 +94,7 @@ test_cases = [
         },
         cls=GcpBigtableInstanceIam,
         type='gcp.bigtableadmin.projects.instances.iam',
-        name='//bigtableadmin.googleapis.com/projects/my_project/instances/my_resource'
+        name='//bigtable.googleapis.com/projects/my_project/instances/my_resource'
     ),
     ResourceTestCase(
         input={
@@ -262,7 +262,9 @@ test_cases = [
         },
         cls=GcpStorageBucket,
         type='gcp.storage.buckets',
-        name='//storage.googleapis.com/buckets/my_resource'
+        # This should include the collection name `/buckets/`, but CAI doesn't do that
+        # See: https://issuetracker.google.com/issues/131586763
+        name='//storage.googleapis.com/my_resource'
     ),
     ResourceTestCase(
         input={
@@ -272,7 +274,9 @@ test_cases = [
         },
         cls=GcpStorageBucketIamPolicy,
         type='gcp.storage.buckets.iam',
-        name='//storage.googleapis.com/buckets/my_resource'
+        # This should include the collection name `/buckets/`, but CAI doesn't do that
+        # See: https://issuetracker.google.com/issues/131586763
+        name='//storage.googleapis.com/my_resource'
     ),
     ResourceTestCase(
         input={
