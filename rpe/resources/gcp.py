@@ -411,6 +411,8 @@ class GcpAppEngineInstance(GoogleAPIResource):
     readiness_value = 'RUNNING'
     update_method = "debug"
 
+    cai_type = 'appengine.googleapis.com/Instance'  # this is made-up based on existing appengine types
+
     required_resource_data = ['name', 'app', 'service', 'version']
 
     cai_type = None             # unknown
@@ -497,8 +499,6 @@ class GcpBigtableInstanceIam(GcpBigtableInstance):
     readiness_key = None
     readiness_value = None
 
-    cai_type = "bigtableadmin.googleapis.com/Instance"
-
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/instances/{}'.format(
@@ -556,8 +556,6 @@ class GcpCloudFunctionIam(GcpCloudFunction):
     parent_cls = GcpCloudFunction
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
-
-    cai_type = "cloudfunctions.googleapis.com/CloudFunction"  # unreleased
 
     def _get_request_args(self):
         return {
@@ -813,8 +811,6 @@ class GcpPubsubSubscriptionIam(GcpPubsubSubscription):
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
-    cai_type = "pubsub.googleapis.com/Subscription"
-
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/subscriptions/{}'.format(
@@ -874,8 +870,6 @@ class GcpPubsubTopicIam(GcpPubsubTopic):
     parent_cls = GcpPubsubTopic
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
-
-    cai_type = "pubsub.googleapis.com/Topic"
 
     def _get_request_args(self):
         return {
@@ -1002,7 +996,7 @@ class GcpProjectService(GoogleAPIResource):
 
     required_resource_data = ['name', 'project_id']
 
-    cai_type = None
+    cai_type = 'serviceusage.googleapis.com/Service'
 
     def _get_request_args(self):
         return {
