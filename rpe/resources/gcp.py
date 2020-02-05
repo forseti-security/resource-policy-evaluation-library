@@ -27,6 +27,7 @@ from googleapiclienthelpers.waiter import Waiter
 # client for resource manager, will be lazy created later
 resource_manager_projects = None
 
+
 class GoogleAPIResource(Resource):
 
     # Names of the get and update methods. Most are the same but override in
@@ -34,7 +35,7 @@ class GoogleAPIResource(Resource):
     resource_property = None
     get_method = "get"
     update_method = "update"
-    required_resource_data = [ 'name' ]
+    required_resource_data = ['name']
 
     parent_cls = None
 
@@ -67,7 +68,6 @@ class GoogleAPIResource(Resource):
             **self._client_kwargs
         )
 
-
         # Support original update method until we can deprecate it
         self.update = self.remediate
 
@@ -75,7 +75,7 @@ class GoogleAPIResource(Resource):
         if self.parent_cls:
 
             self.parent_resource = self.parent_cls(
-                client_kwargs = self._client_kwargs,
+                client_kwargs=self._client_kwargs,
                 **self._resource_data.copy()
             )
 
@@ -92,10 +92,8 @@ class GoogleAPIResource(Resource):
                 )
             )
 
-
     def is_property(self):
         return self.resource_property is not None
-
 
     @staticmethod
     def _extract_cai_name_data(name):
@@ -109,12 +107,12 @@ class GoogleAPIResource(Resource):
 
 
             # Less-common resource data
-            ## AppEngine
+            #  AppEngine
             'app': r'/apps/([^\/]+)/',
             'service': r'/services/([^\/]+)/',
             'version': r'/versions/([^\/]+)/',
 
-            ## NodePools
+            #  NodePools
             'cluster': r'/clusters/([^\/]+)/',
         }
 
@@ -127,7 +125,6 @@ class GoogleAPIResource(Resource):
                 resource_data[field_name] = m.group(1)
 
         return resource_data
-
 
     @staticmethod
     def from_cai_data(resource_name, asset_type, content_type='resource', client_kwargs={}):
@@ -188,7 +185,6 @@ class GoogleAPIResource(Resource):
             client_kwargs=client_kwargs,
             **resource_data
         )
-
 
     @staticmethod
     def factory(client_kwargs={}, **kwargs):
