@@ -224,6 +224,15 @@ class GoogleAPIResource(Resource):
         cls = resource_type_map.get(resource_type)
         return cls(client_kwargs=client_kwargs, **kwargs)
 
+    def to_dict(self):
+        details = self._resource_data.copy()
+        details.update({
+            'cai_type': self.cai_type,
+            'full_resource_name': self.full_resource_name(),
+            'organization': self.organization,
+        })
+        return details
+
     def type(self):
         type_components = ["gcp", self.service_name, self.resource_path]
 
@@ -381,6 +390,7 @@ class GoogleAPIResource(Resource):
 
         # attempt to fill in the resource's ancestry
         # if the target project has the cloudresourcemanager api disabled, this will fail
+        # if the resource_data doesn't include the project_id (ex: with storage buckets) this will also fail
         try:
             global resource_manager_projects
             if resource_manager_projects is None:
@@ -388,14 +398,32 @@ class GoogleAPIResource(Resource):
                     'cloudresourcemanager.projects', 'v1', **self._client_kwargs
                 )
 
-            self._ancestry = resource_manager_projects.getAncestry(
+            resp = resource_manager_projects.getAncestry(
                 projectId=self._resource_data['project_id']
             ).execute()
+
+            # Reformat getAncestry response to be a list of resource names
+            self._ancestry = [
+                f"//cloudresourcemanager.googleapis.com/{ancestor['resourceId']['type']}s/{ancestor['resourceId']['id']}"
+                for ancestor in resp.get('ancestor')
+            ]
+
         except Exception:
             # This call is best-effort. Any failures should be caught
             pass
 
         return self._ancestry
+
+    @property
+    def organization(self):
+        ancestry = self.ancestry
+        if not ancestry:
+            return None
+
+        return next(
+            (ancestor for ancestor in ancestry if ancestor.startswith('//cloudresourcemanager.googleapis.com/organizations/')),
+            None
+        )
 
 
 class GcpAppEngineInstance(GoogleAPIResource):
