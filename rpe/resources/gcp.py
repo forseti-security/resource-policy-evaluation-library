@@ -27,6 +27,7 @@ from googleapiclienthelpers.waiter import Waiter
 # client for resource manager, will be lazy created later
 resource_manager_projects = None
 
+
 class GoogleAPIResource(Resource):
 
     # Names of the get and update methods. Most are the same but override in
@@ -34,7 +35,7 @@ class GoogleAPIResource(Resource):
     resource_property = None
     get_method = "get"
     update_method = "update"
-    required_resource_data = [ 'name' ]
+    required_resource_data = ['name']
 
     parent_cls = None
 
@@ -67,7 +68,6 @@ class GoogleAPIResource(Resource):
             **self._client_kwargs
         )
 
-
         # Support original update method until we can deprecate it
         self.update = self.remediate
 
@@ -75,7 +75,7 @@ class GoogleAPIResource(Resource):
         if self.parent_cls:
 
             self.parent_resource = self.parent_cls(
-                client_kwargs = self._client_kwargs,
+                client_kwargs=self._client_kwargs,
                 **self._resource_data.copy()
             )
 
@@ -92,10 +92,8 @@ class GoogleAPIResource(Resource):
                 )
             )
 
-
     def is_property(self):
         return self.resource_property is not None
-
 
     @staticmethod
     def _extract_cai_name_data(name):
@@ -109,12 +107,12 @@ class GoogleAPIResource(Resource):
 
 
             # Less-common resource data
-            ## AppEngine
+            #  AppEngine
             'app': r'/apps/([^\/]+)/',
             'service': r'/services/([^\/]+)/',
             'version': r'/versions/([^\/]+)/',
 
-            ## NodePools
+            #  NodePools
             'cluster': r'/clusters/([^\/]+)/',
         }
 
@@ -127,7 +125,6 @@ class GoogleAPIResource(Resource):
                 resource_data[field_name] = m.group(1)
 
         return resource_data
-
 
     @staticmethod
     def from_cai_data(resource_name, asset_type, content_type='resource', client_kwargs={}):
@@ -189,7 +186,6 @@ class GoogleAPIResource(Resource):
             **resource_data
         )
 
-
     @staticmethod
     def factory(client_kwargs={}, **kwargs):
         resource_type_map = {
@@ -227,6 +223,15 @@ class GoogleAPIResource(Resource):
 
         cls = resource_type_map.get(resource_type)
         return cls(client_kwargs=client_kwargs, **kwargs)
+
+    def to_dict(self):
+        details = self._resource_data.copy()
+        details.update({
+            'cai_type': self.cai_type,
+            'full_resource_name': self.full_resource_name(),
+            'organization': self.organization,
+        })
+        return details
 
     def type(self):
         type_components = ["gcp", self.service_name, self.resource_path]
@@ -385,6 +390,7 @@ class GoogleAPIResource(Resource):
 
         # attempt to fill in the resource's ancestry
         # if the target project has the cloudresourcemanager api disabled, this will fail
+        # if the resource_data doesn't include the project_id (ex: with storage buckets) this will also fail
         try:
             global resource_manager_projects
             if resource_manager_projects is None:
@@ -392,14 +398,32 @@ class GoogleAPIResource(Resource):
                     'cloudresourcemanager.projects', 'v1', **self._client_kwargs
                 )
 
-            self._ancestry = resource_manager_projects.getAncestry(
+            resp = resource_manager_projects.getAncestry(
                 projectId=self._resource_data['project_id']
             ).execute()
+
+            # Reformat getAncestry response to be a list of resource names
+            self._ancestry = [
+                f"//cloudresourcemanager.googleapis.com/{ancestor['resourceId']['type']}s/{ancestor['resourceId']['id']}"
+                for ancestor in resp.get('ancestor')
+            ]
+
         except Exception:
             # This call is best-effort. Any failures should be caught
             pass
 
         return self._ancestry
+
+    @property
+    def organization(self):
+        ancestry = self.ancestry
+        if not ancestry:
+            return None
+
+        return next(
+            (ancestor for ancestor in ancestry if ancestor.startswith('//cloudresourcemanager.googleapis.com/organizations/')),
+            None
+        )
 
 
 class GcpAppEngineInstance(GoogleAPIResource):
@@ -410,6 +434,8 @@ class GcpAppEngineInstance(GoogleAPIResource):
     readiness_key = 'vmStatus'
     readiness_value = 'RUNNING'
     update_method = "debug"
+
+    cai_type = 'appengine.googleapis.com/Instance'  # this is made-up based on existing appengine types
 
     required_resource_data = ['name', 'app', 'service', 'version']
 
@@ -497,8 +523,6 @@ class GcpBigtableInstanceIam(GcpBigtableInstance):
     readiness_key = None
     readiness_value = None
 
-    cai_type = "bigtableadmin.googleapis.com/Instance"
-
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/instances/{}'.format(
@@ -556,8 +580,6 @@ class GcpCloudFunctionIam(GcpCloudFunction):
     parent_cls = GcpCloudFunction
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
-
-    cai_type = "cloudfunctions.googleapis.com/CloudFunction"  # unreleased
 
     def _get_request_args(self):
         return {
@@ -813,8 +835,6 @@ class GcpPubsubSubscriptionIam(GcpPubsubSubscription):
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
 
-    cai_type = "pubsub.googleapis.com/Subscription"
-
     def _get_request_args(self):
         return {
             'resource': 'projects/{}/subscriptions/{}'.format(
@@ -874,8 +894,6 @@ class GcpPubsubTopicIam(GcpPubsubTopic):
     parent_cls = GcpPubsubTopic
     get_method = "getIamPolicy"
     update_method = "setIamPolicy"
-
-    cai_type = "pubsub.googleapis.com/Topic"
 
     def _get_request_args(self):
         return {
@@ -1002,7 +1020,7 @@ class GcpProjectService(GoogleAPIResource):
 
     required_resource_data = ['name', 'project_id']
 
-    cai_type = None
+    cai_type = 'serviceusage.googleapis.com/Service'
 
     def _get_request_args(self):
         return {
