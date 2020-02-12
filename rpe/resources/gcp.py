@@ -50,6 +50,10 @@ class GoogleAPIResource(Resource):
 
     def __init__(self, client_kwargs={}, **resource_data):
 
+        # Set some defaults
+        self._service = None
+        self._parent_resource = None
+
         # Load and validate additional resource data
         self._resource_data = resource_data
         self._validate_resource_data()
@@ -57,27 +61,8 @@ class GoogleAPIResource(Resource):
         # Store the client kwargs to pass to any new clients
         self._client_kwargs = client_kwargs
 
-        full_resource_path = "{}.{}".format(
-            self.service_name,
-            self.resource_path
-        )
-
-        self.service = build_subresource(
-            full_resource_path,
-            self.version,
-            **self._client_kwargs
-        )
-
         # Support original update method until we can deprecate it
         self.update = self.remediate
-
-        # If there is a parent class, retrieve that as well
-        if self.parent_cls:
-
-            self.parent_resource = self.parent_cls(
-                client_kwargs=self._client_kwargs,
-                **self._resource_data.copy()
-            )
 
         self._ancestry = None
 
@@ -424,6 +409,51 @@ class GoogleAPIResource(Resource):
             (ancestor for ancestor in ancestry if ancestor.startswith('//cloudresourcemanager.googleapis.com/organizations/')),
             None
         )
+
+    @property
+    def client_kwargs(self):
+        return self._client_kwargs
+
+    @client_kwargs.setter
+    def client_kwargs(self, client_kwargs):
+
+        # Invalidate service/parent because client_kwargs changed
+        self._service = None
+        self._parent_resource = None
+
+        self._client_kwargs = client_kwargs
+
+    @property
+    def service(self):
+        if self._service is None:
+
+            full_resource_path = "{}.{}".format(
+                self.service_name,
+                self.resource_path
+            )
+
+            self._service = build_subresource(
+                full_resource_path,
+                self.version,
+                **self._client_kwargs
+            )
+        return self._service
+
+    @property
+    def project_id(self):
+        return self._resource_data.get('project_id')
+
+    @property
+    def parent_resource(self):
+        # If there is a parent class, return it as a resource
+
+        if self._parent_resource is None and self.parent_cls:
+
+            self._parent_resource = self.parent_cls(
+                client_kwargs=self._client_kwargs,
+                **self._resource_data.copy()
+            )
+        return self._parent_resource
 
 
 class GcpAppEngineInstance(GoogleAPIResource):
