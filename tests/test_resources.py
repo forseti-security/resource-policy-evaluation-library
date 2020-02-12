@@ -310,11 +310,21 @@ def test_gcp_resource_factory(case):
     r = Resource.factory("gcp", client_kwargs=client_kwargs, **case.input)
     assert r.__class__ == case.cls
     assert r.type() == case.type
+    assert isinstance(r._get_request_args(), dict)
 
 
-def test_gcp_resource_factory_invalid():
-    with pytest.raises(ResourceException):
+def test_gcp_resource_factory_no_type():
+    with pytest.raises(ResourceException) as excinfo:
         Resource.factory('gcp')
+
+    assert 'Resource type not specified' in str(excinfo.value)
+
+
+def test_gcp_resource_factory_bad_type():
+    with pytest.raises(ResourceException) as excinfo:
+        Resource.factory('gcp', resource_type='fake.type')
+
+    assert 'Unknown resource type' in str(excinfo.value)
 
 
 @pytest.mark.parametrize(
@@ -324,3 +334,26 @@ def test_gcp_resource_factory_invalid():
 def test_gcp_full_resource_name(case):
     r = Resource.factory("gcp", client_kwargs=client_kwargs, **case.input)
     assert r.full_resource_name() == case.name
+
+
+def test_missing_input():
+    with pytest.raises(ResourceException) as excinfo:
+
+        GcpAppEngineInstance(name=test_resource_name)
+
+    assert "Missing data required for resource creation" in str(excinfo.value)
+
+
+def test_gcp_to_dict():
+    r = Resource.factory(
+        'gcp',
+        client_kwargs=client_kwargs,
+        name=test_resource_name,
+        project_id=test_project,
+        resource_type='storage.buckets.iam',
+    )
+
+    data = r.to_dict()
+    # with no creds, we should still get this key but it should be none
+    assert data['organization'] is None
+    assert data['project_id'] == test_project

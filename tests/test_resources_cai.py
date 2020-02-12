@@ -18,6 +18,7 @@ import pytest
 
 from google.oauth2.credentials import Credentials
 
+from rpe.exceptions import ResourceException
 from rpe.resources.gcp import GoogleAPIResource
 from rpe.resources.gcp import GcpAppEngineInstance
 from rpe.resources.gcp import GcpBigqueryDataset
@@ -236,6 +237,7 @@ test_cases = [
     ),
 ]
 
+
 @pytest.mark.parametrize(
     "case",
     test_cases,
@@ -249,3 +251,28 @@ def test_gcp_resource_from_cai_data(case):
     )
     assert r.__class__ == case.resource_cls
     assert r.full_resource_name() == case.data.get('name')
+
+
+def test_bad_content_type():
+
+    with pytest.raises(ResourceException) as excinfo:
+        GoogleAPIResource.from_cai_data(
+            '//cloudresourcemanager.googleapis.com/projects/test-resource',
+            'cloudresourcemanager.googleapis.com/Project',
+            'fake_content_type',
+            client_kwargs=client_kwargs,
+        )
+
+    assert 'Unrecognized content type' in str(excinfo.value)
+
+
+def test_bad_asset_type():
+
+    with pytest.raises(ResourceException) as excinfo:
+        GoogleAPIResource.from_cai_data(
+            '//cloudfakeservice.googleapis.com/widgets/test-resource',
+            'cloudfakeservice.googleapis.com/Widget',
+            client_kwargs=client_kwargs,
+        )
+
+    assert 'Unrecognized asset type' in str(excinfo.value)
