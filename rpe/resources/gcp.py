@@ -24,9 +24,6 @@ import tenacity
 from googleapiclienthelpers.discovery import build_subresource
 from googleapiclienthelpers.waiter import Waiter
 
-# client for resource manager, will be lazy created later
-resource_manager_projects = None
-
 
 class GoogleAPIResource(Resource):
 
@@ -377,14 +374,12 @@ class GoogleAPIResource(Resource):
         # if the target project has the cloudresourcemanager api disabled, this will fail
         # if the resource_data doesn't include the project_id (ex: with storage buckets) this will also fail
         try:
-            global resource_manager_projects
-            if resource_manager_projects is None:
-                resource_manager_projects = build_subresource(
-                    'cloudresourcemanager.projects', 'v1', **self._client_kwargs
-                )
+            resource_manager_projects = build_subresource(
+                'cloudresourcemanager.projects', 'v1', **self._client_kwargs
+            )
 
             resp = resource_manager_projects.getAncestry(
-                projectId=self._resource_data['project_id']
+                projectId=self.project_id
             ).execute()
 
             # Reformat getAncestry response to be a list of resource names
