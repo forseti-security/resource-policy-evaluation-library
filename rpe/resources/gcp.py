@@ -109,7 +109,7 @@ class GoogleAPIResource(Resource):
         return resource_data
 
     @staticmethod
-    def from_cai_data(resource_name, asset_type, content_type='resource', client_kwargs={}):
+    def from_cai_data(resource_name, asset_type, content_type='resource', project_id=None, client_kwargs={}):
 
         # CAI classifies things by content_type (ex: resource or iam)
         # and asset_type (ex: storage bucket or container cluster)
@@ -162,6 +162,10 @@ class GoogleAPIResource(Resource):
         cls = asset_type_map.get(asset_type)
 
         resource_data = GoogleAPIResource._extract_cai_name_data(resource_name)
+
+        # if the project_id was passed, and its wasnt found in the resource name, add it
+        if project_id and 'project_id' not in resource_data:
+            resource_data['project_id'] = project_id
 
         return cls(
             client_kwargs=client_kwargs,
