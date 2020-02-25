@@ -468,8 +468,6 @@ class GcpAppEngineInstance(GoogleAPIResource):
 
     required_resource_data = ['name', 'app', 'service', 'version']
 
-    cai_type = None             # unknown
-
     def _get_request_args(self):
         return {
             'appsId': self._resource_data['app'],
