@@ -44,6 +44,7 @@ class GoogleAPIResource(Resource):
     # Key/Value to check to see if a resource is ready
     readiness_key = None
     readiness_value = None
+    readiness_terminal_values = []
 
     def __init__(self, client_kwargs={}, **resource_data):
 
@@ -315,6 +316,7 @@ class GoogleAPIResource(Resource):
             asset = waiter.wait(
                 self.readiness_key,
                 self.readiness_value,
+                terminal_values=self.readiness_terminal_values,
                 interval=10,
                 retries=90
             )
@@ -979,6 +981,7 @@ class GcpSqlInstance(GoogleAPIResource):
     version = "v1beta4"
     readiness_key = 'state'
     readiness_value = 'RUNNABLE'
+    readiness_terminal_values = ['FAILED', 'MAINTENANCE', 'SUSPENDED', 'UNKNOWN_STATE']
 
     cai_type = "sqladmin.googleapis.com/Instance"
 
