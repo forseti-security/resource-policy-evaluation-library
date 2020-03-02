@@ -216,7 +216,6 @@ class GoogleAPIResource(Resource):
         details.update({
             'cai_type': self.cai_type,
             'full_resource_name': self.full_resource_name(),
-            'organization': self.organization,
         })
         return details
 

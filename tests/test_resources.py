@@ -355,5 +355,4 @@ def test_gcp_to_dict():
 
     data = r.to_dict()
     # with no creds, we should still get this key but it should be none
-    assert data['organization'] is None
     assert data['project_id'] == test_project
