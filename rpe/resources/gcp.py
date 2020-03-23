@@ -558,7 +558,7 @@ class GcpGkeCluster(GoogleAPIResource):
     version = "v1"
     readiness_key = 'status'
     readiness_value = 'RUNNING'
-    readiness_terminal_values = ['ERROR', 'DEGRADED']
+    readiness_terminal_values = ['ERROR', 'DEGRADED', 'STOPPING', 'STATUS_UNSPECIFIED']
 
     required_resource_data = ['name', 'location', 'project_id']
 
