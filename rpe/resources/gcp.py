@@ -220,16 +220,7 @@ class GoogleAPIResource(Resource):
         return details
 
     def type(self):
-        type_components = ["gcp", self.service_name, self.resource_path]
-
-        # Things like IAM policy are not separate resources, but rather
-        # properties of a resource. We may want to evaluate policy on these
-        # properties, so we represent them as resources and need to distinguish
-        # them in the resource type.
-        if self.is_property():
-            type_components.append(self.resource_property)
-
-        return ".".join(type_components)
+        return self.cai_type
 
     # Google's documentation describes what it calls a 'full resource name' for
     # resources. None of the API's seem to implement it (except Cloud Asset
