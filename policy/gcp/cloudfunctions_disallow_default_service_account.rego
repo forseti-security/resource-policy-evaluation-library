@@ -40,7 +40,7 @@ default excluded = false
 
 # Check if default service account is not used
 valid = true {
-  input.serviceAccountEmail != serviceAccountEmail
+  resource.serviceAccountEmail != serviceAccountEmail
 }
 
 # Check for a global exclusion based on resource labels

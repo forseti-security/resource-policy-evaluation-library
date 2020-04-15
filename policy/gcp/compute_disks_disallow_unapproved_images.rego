@@ -28,7 +28,8 @@ applies_to =  [
 # Resource metadata
 #####
 
-labels = input.labels
+resource = input.resource
+labels = resource.labels
 
 #####
 # Policy evaluation
@@ -41,7 +42,7 @@ default excluded = false
 
 # Check if hardened image used
 valid = true {
-    contains(input.sourceImage, concat("/",["projects",data.config.instances.harden_images_project]))
+    contains(resource.sourceImage, concat("/",["projects",data.config.gcp.compute.harden_images_project]))
 }
 
 

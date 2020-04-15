@@ -40,7 +40,7 @@ default excluded = false
 
 valid = false {
   # Check for bad acl
-  input.access[_].specialGroup == "allAuthenticatedUsers"
+  resource.access[_].specialGroup == "allAuthenticatedUsers"
 }
 
 excluded = true {
@@ -51,20 +51,26 @@ excluded = true {
 # Remediation
 #####
 
-# Copy of the input, omitting the acls
-remediate[key] = value {
- key != "access"
- input[key]=value
+remediate = {
+  "_remediation_spec": "v2beta1",
+  "steps": [
+    remove_bad_bindings
+  ]
 }
 
-# Add the acls, as defined below
-remediate[key] = value {
-  key := "access"
-  value := _access
+remove_bad_bindings = {
+    "method": "patch",
+    "params": {
+        "projectId": resource.datasetReference.projectId,
+        "datasetId": resource.datasetReference.datasetId,
+        "body": {
+          "access": _access
+        },
+    }
 }
 
 # Return only valid acls using the function below
-_access= [acl | acl := input.access[_]
+_access= [acl | acl := resource.access[_]
   _valid_acl(acl)
 ]
 

@@ -35,12 +35,11 @@ labels = resource.labels
 #####
 
 default valid = true
+default excluded = false
 
 valid = false {
     resource.vmDebugEnabled == true
 }
-
-excluded = false
 
 #####
  # Remediation

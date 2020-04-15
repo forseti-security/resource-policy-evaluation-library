@@ -42,7 +42,7 @@ default excluded = false
 
 # Check if hardened image used
 valid = true {
-    contains(resource.config.masterConfig.imageUri, concat("/",["projects",data.config.dataproc.harden_images_project]))
+    contains(resource.config.masterConfig.imageUri, concat("/",["projects",data.config.gcp.dataproc.harden_images_project]))
 }
 
 # Check for a global exclusion based on resource labels

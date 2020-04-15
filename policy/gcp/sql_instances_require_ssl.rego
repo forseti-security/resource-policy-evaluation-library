@@ -44,7 +44,7 @@ valid = true {
 }
 
 # Check for a global exclusion based on resource labels
-valid = true {
+excluded = true {
   data.exclusions.label_exclude(labels)
 }
 
