@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.sql_instances_disallow_public_network_access
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.sql_instances_disallow_public_network_access
 #####
 
 description = "Disallow public network access to SQL instances"
-applies_to = [
-    "sqladmin.googleapis.com/Instance"
-]
+
+applies_to = ["sqladmin.googleapis.com/Instance"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.settings.userLabels
 
 #####
@@ -36,15 +35,15 @@ labels = resource.settings.userLabels
 #####
 
 default valid = true
+
 default excluded = false
 
-
 valid = false {
-  resource.settings.ipConfiguration.authorizedNetworks[_].value == "0.0.0.0/0"
+	resource.settings.ipConfiguration.authorizedNetworks[_].value == "0.0.0.0/0"
 }
 
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -52,28 +51,21 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    remove_bad_acls
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [remove_bad_acls],
 }
 
 remove_bad_acls = {
-    "method": "patch",
-    "params": {
-        "project": resource.project,
-        "instance": resource.name,
-        "body":  {
-          "settings": {
-            "ipConfiguration": {
-              "authorizedNetworks": _valid_authorized_networks
-            }
-          }
-        }
-    }
+	"method": "patch",
+	"params": {
+		"project": resource.project,
+		"instance": resource.name,
+		"body": {"settings": {"ipConfiguration": {"authorizedNetworks": _valid_authorized_networks}}},
+	},
 }
 
 # Remove any invalid authorized networks
-_valid_authorized_networks = [net | net := resource.settings.ipConfiguration.authorizedNetworks[_]
-  net.value != "0.0.0.0/0"
+_valid_authorized_networks = [net |
+	net := resource.settings.ipConfiguration.authorizedNetworks[_]
+	net.value != "0.0.0.0/0"
 ]

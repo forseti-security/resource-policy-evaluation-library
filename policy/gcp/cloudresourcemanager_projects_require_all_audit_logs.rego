@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.cloudresourcemanager_projects_require_all_audit_logs
 
 #####
@@ -20,38 +19,38 @@ package rpe.policy.cloudresourcemanager_projects_require_all_audit_logs
 #####
 
 description = "Require that all audit logs are enabled on a project"
-applies_to =  [
-  "cloudresourcemanager.googleapis.com/Project"
-]
+
+applies_to = ["cloudresourcemanager.googleapis.com/Project"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 iam = input.iam
+
 labels = resource.settings.userLabels
 
 #####
 # Policy evaluation
 #####
 
-default valid=false
-default excluded=false
+default valid = false
 
-valid = true {
+default excluded = false
 
-  # If there is only 1 auditConfig entry, and it enables all logs for allServices, this requirement is met
-  count(iam.auditConfigs) = 1
-  iam.auditConfigs[entry].service = "allServices"
-  iam.auditConfigs[entry].auditLogConfigs[_].logType = "ADMIN_READ"
-  iam.auditConfigs[entry].auditLogConfigs[_].logType = "DATA_WRITE"
-  iam.auditConfigs[entry].auditLogConfigs[_].logType = "DATA_READ"
-
+valid {
+	# If there is only 1 auditConfig entry, and it enables all logs for allServices, this requirement is met
+	count(iam.auditConfigs) = 1
+	iam.auditConfigs[entry].service = "allServices"
+	iam.auditConfigs[entry].auditLogConfigs[_].logType = "ADMIN_READ"
+	iam.auditConfigs[entry].auditLogConfigs[_].logType = "DATA_WRITE"
+	iam.auditConfigs[entry].auditLogConfigs[_].logType = "DATA_READ"
 }
 
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -59,37 +58,27 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    set_audit_configs
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [set_audit_configs],
 }
 
 set_audit_configs = {
-    "method": "setIamPolicy",
-    "params": {
-        "resource": resource.projectId,
-        "body":  {
-            "policy": {
-              "audit_configs": _defaultAuditConfig
-            },
-            "updateMask": "auditConfigs",
-        }
-    }
+	"method": "setIamPolicy",
+	"params": {
+		"resource": resource.projectId,
+		"body": {
+			"policy": {"audit_configs": _defaultAuditConfig},
+			"updateMask": "auditConfigs",
+		},
+	},
 }
 
 # The expected default audit config
 _defaultAuditConfig = [{
-  "service": "allServices",
-  "audit_log_configs": [
-    {
-      "log_type": "ADMIN_READ"
-    },
-    {
-      "log_type": "DATA_WRITE"
-    },
-    {
-      "log_type": "DATA_READ"
-    }
-  ]
+	"service": "allServices",
+	"audit_log_configs": [
+		{"log_type": "ADMIN_READ"},
+		{"log_type": "DATA_WRITE"},
+		{"log_type": "DATA_READ"},
+	],
 }]

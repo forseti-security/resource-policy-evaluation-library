@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.bigquery_datasets_disallow_unauthenticated_public_access
 
 #####
@@ -20,16 +19,15 @@ package rpe.policy.bigquery_datasets_disallow_unauthenticated_public_access
 #####
 
 description = "Disallow unauthenticated public access to bigquery datasets"
-applies_to =  [
-  "bigquery.googleapis.com/Dataset"
-]
 
+applies_to = ["bigquery.googleapis.com/Dataset"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -37,15 +35,16 @@ labels = resource.labels
 #####
 
 default valid = true
+
 default excluded = false
 
 valid = false {
-  # Check for bad acl
-  resource.access[_].iamMember == "allUsers"
+	# Check for bad acl
+	resource.access[_].iamMember == "allUsers"
 }
 
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -53,32 +52,31 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    remove_bad_bindings
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [remove_bad_bindings],
 }
 
 remove_bad_bindings = {
-    "method": "patch",
-    "params": {
-        "projectId": resource.datasetReference.projectId,
-        "datasetId": resource.datasetReference.datasetId,
-        "body": {
-          "access": _access
-        },
-    }
+	"method": "patch",
+	"params": {
+		"projectId": resource.datasetReference.projectId,
+		"datasetId": resource.datasetReference.datasetId,
+		"body": {"access": _access},
+	},
 }
 
 # Return only valid acls using the function below
-_access= [acl | acl := resource.access[_]
-  _valid_acl(acl)
+_access = [acl |
+	acl := resource.access[_]
+	_valid_acl(acl)
 ]
 
-_valid_acl(acl) = true {
-  # If the iamMember is anything other than "allUsers"
-  acl.iamMember != "allUsers"
-}{
-  # Or if there is no iamMember key
-  not acl["iamMember"]
+_valid_acl(acl) {
+	# If the iamMember is anything other than "allUsers"
+	acl.iamMember != "allUsers"
+}
+
+_valid_acl(acl) {
+	# Or if there is no iamMember key
+	not acl.iamMember
 }

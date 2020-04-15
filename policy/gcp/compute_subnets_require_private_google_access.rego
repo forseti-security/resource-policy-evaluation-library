@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.compute_subnets_require_private_google_access
+
 import data.rpe.gcp.util as gcputil
 
 #####
@@ -21,15 +21,15 @@ import data.rpe.gcp.util as gcputil
 #####
 
 description = "Require private google access for subnetworks"
-applies_to = [
-  "compute.googleapis.com/Subnetwork"
-]
+
+applies_to = ["compute.googleapis.com/Subnetwork"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -37,16 +37,17 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if accessing Google services without external IP is enabled
-valid = true {
-  resource.privateIpGoogleAccess == true
+valid {
+	resource.privateIpGoogleAccess == true
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -54,20 +55,16 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    enable_private_google_access
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [enable_private_google_access],
 }
 
 enable_private_google_access = {
-    "method": "setPrivateIpGoogleAccess",
-    "params": {
-        "subnetwork": resource.name,
-        "region": gcputil.resource_from_collection_path(resource.selfLink, "regions"),
-        "project": gcputil.resource_from_collection_path(resource.selfLink, "projects"),
-        "body":  {
-            "privateIpGoogleAccess": true
-        }
-    }
+	"method": "setPrivateIpGoogleAccess",
+	"params": {
+		"subnetwork": resource.name,
+		"region": gcputil.resource_from_collection_path(resource.selfLink, "regions"),
+		"project": gcputil.resource_from_collection_path(resource.selfLink, "projects"),
+		"body": {"privateIpGoogleAccess": true},
+	},
 }

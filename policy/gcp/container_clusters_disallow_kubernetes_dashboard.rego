@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.container_clusters_disallow_kubernetes_dashboard
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.container_clusters_disallow_kubernetes_dashboard
 #####
 
 description = "Disallow the use of the kubernetes dashboard"
-applies_to = [
-  "container.googleapis.com/Cluster"
-]
+
+applies_to = ["container.googleapis.com/Cluster"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,16 +35,17 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if legacy ABAC is enabled
-valid = true {
-  resource.addonsConfig.kubernetesDashboard.disabled == true
+valid {
+	resource.addonsConfig.kubernetesDashboard.disabled == true
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -53,25 +53,19 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    disable_kubernetes_dashboard
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [disable_kubernetes_dashboard],
 }
 
 disable_kubernetes_dashboard = {
-    "method": "setAddons",
-    "params": {
-        "name": combinedName,
-        "body":  {
-            "name": combinedName,
-            "addonsConfig": {
-              "kubernetesDashboard": {
-                "disabled": true
-              }
-            }
-        }
-    }
+	"method": "setAddons",
+	"params": {
+		"name": combinedName,
+		"body": {
+			"name": combinedName,
+			"addonsConfig": {"kubernetesDashboard": {"disabled": true}},
+		},
+	},
 }
 
 # break out the selfLink so we can extract the project, region and name

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.dataproc_clusters_require_stackdriver_logging
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.dataproc_clusters_require_stackdriver_logging
 #####
 
 description = "Require stackdriver logging for dataproc clusters"
-applies_to = [
-    "dataproc.googleapis.com/Cluster"
-]
+
+applies_to = ["dataproc.googleapis.com/Cluster"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,15 +35,16 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
-valid = true {
-  resource.config.softwareConfig.properties["dataproc:dataproc.logging.stackdriver.enable"] == "true"
+valid {
+	resource.config.softwareConfig.properties["dataproc:dataproc.logging.stackdriver.enable"] == "true"
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -52,19 +52,17 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    delete_dataproc_cluster
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [delete_dataproc_cluster],
 }
 
 delete_dataproc_cluster = {
-    "method": "delete",
-    "params": {
-        "projectId": resource.projectId,
-        "region": labels["goog-dataproc-location"],
-        "clusterName": resource.clusterName,
-        "clusterUuid": resource.clusterUuid,
-        "requestId": "real-time-enforcer-delete"
-    }
+	"method": "delete",
+	"params": {
+		"projectId": resource.projectId,
+		"region": labels["goog-dataproc-location"],
+		"clusterName": resource.clusterName,
+		"clusterUuid": resource.clusterUuid,
+		"requestId": "real-time-enforcer-delete",
+	},
 }

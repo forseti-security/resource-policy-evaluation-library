@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.sql_instances_require_backup_configuration
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.sql_instances_require_backup_configuration
 #####
 
 description = "Require scheduled backups for SQL instances"
-applies_to = [
-    "sqladmin.googleapis.com/Instance"
-]
+
+applies_to = ["sqladmin.googleapis.com/Instance"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.settings.userLabels
 
 #####
@@ -36,21 +35,22 @@ labels = resource.settings.userLabels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if backups are enabled
-valid = true {
-  resource.settings.backupConfiguration.enabled == true
+valid {
+	resource.settings.backupConfiguration.enabled == true
 }
 
- # If this is a replica, you can't enable backups
-valid = true {
-  resource.replicaConfiguration
+# If this is a replica, you can't enable backups
+valid {
+	resource.replicaConfiguration
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -58,23 +58,15 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    enable_backups
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [enable_backups],
 }
 
 enable_backups = {
-    "method": "patch",
-    "params": {
-        "project": resource.project,
-        "instance": resource.name,
-        "body":  {
-          "settings": {
-            "backupConfiguration": {
-              "enabled": true
-            }
-          }
-        }
-    }
+	"method": "patch",
+	"params": {
+		"project": resource.project,
+		"instance": resource.name,
+		"body": {"settings": {"backupConfiguration": {"enabled": true}}},
+	},
 }

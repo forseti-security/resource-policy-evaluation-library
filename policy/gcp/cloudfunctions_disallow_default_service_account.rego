@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.cloudfunctions_disallow_default_service_account
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.cloudfunctions_disallow_default_service_account
 #####
 
 description = "Disallow the use of the default service account for running cloud functions"
-applies_to = [
-  "cloudfunctions.googleapis.com/CloudFunction"
-]
+
+applies_to = ["cloudfunctions.googleapis.com/CloudFunction"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,19 +35,21 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if default service account is not used
-valid = true {
-  resource.serviceAccountEmail != serviceAccountEmail
+valid {
+	resource.serviceAccountEmail != serviceAccountEmail
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 # extract project name from function name
 projectNamePart = split(resource.name, "/")
+
 # construct email for default cloud function service account
 serviceAccountEmail = concat("@", [projectNamePart[1], "appspot.gserviceaccount.com"])

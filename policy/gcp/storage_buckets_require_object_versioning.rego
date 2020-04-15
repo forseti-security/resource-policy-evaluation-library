@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.storage_buckets_require_object_versioning
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.storage_buckets_require_object_versioning
 #####
 
 description = "Require object versioning for storage buckets"
-applies_to = [
-  "storage.googleapis.com/Bucket"
-]
+
+applies_to = ["storage.googleapis.com/Bucket"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,14 +35,15 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
-valid = true {
-  resource.versioning.enabled = true
+valid {
+	resource.versioning.enabled = true
 }
 
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -51,20 +51,14 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    enable_versioning
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [enable_versioning],
 }
 
 enable_versioning = {
-    "method": "patch",
-    "params": {
-        "bucket": resource.name,
-        "body":  {
-          "versioning": {
-            "enabled": true
-          }
-        }
-    }
+	"method": "patch",
+	"params": {
+		"bucket": resource.name,
+		"body": {"versioning": {"enabled": true}},
+	},
 }

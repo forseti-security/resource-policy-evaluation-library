@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.compute_disks_disallow_unapproved_images
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.compute_disks_disallow_unapproved_images
 #####
 
 description = "Disallow use of unapproved images for compute disks"
-applies_to =  [
-  "compute.googleapis.com/Disk"
-]
+
+applies_to = ["compute.googleapis.com/Disk"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,16 +35,16 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # approved project_id for images is configured in policy/config.yaml - instances.harden_images_project
 
 # Check if hardened image used
-valid = true {
-    contains(resource.sourceImage, concat("/",["projects",data.config.gcp.compute.harden_images_project]))
+valid {
+	contains(resource.sourceImage, concat("/", ["projects", data.config.gcp.compute.harden_images_project]))
 }
 
-
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }

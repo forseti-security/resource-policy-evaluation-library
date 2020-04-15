@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.container_clusters_require_stackdriver_logging
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.container_clusters_require_stackdriver_logging
 #####
 
 description = "Require stackdriver logging for GKE clusters"
-applies_to = [
-  "container.googleapis.com/Cluster"
-]
+
+applies_to = ["container.googleapis.com/Cluster"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,16 +35,17 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if logging service is enabled (either legacy or k8s native)
-valid = true {
-  startswith(resource.loggingService, "logging.googleapis.com")
+valid {
+	startswith(resource.loggingService, "logging.googleapis.com")
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -53,21 +53,19 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    enable_stackdriver_logging
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [enable_stackdriver_logging],
 }
 
 enable_stackdriver_logging = {
-    "method": "setLogging",
-    "params": {
-        "name": combinedName,
-        "body":  {
-            "name": combinedName,
-            "loggingService": "logging.googleapis.com"
-        }
-    }
+	"method": "setLogging",
+	"params": {
+		"name": combinedName,
+		"body": {
+			"name": combinedName,
+			"loggingService": "logging.googleapis.com",
+		},
+	},
 }
 
 # break out the selfLink so we can extract the project, region and name

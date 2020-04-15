@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.sql_instances_require_ssl
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.sql_instances_require_ssl
 #####
 
 description = "Require SSL for connectivity to SQL instances"
-applies_to = [
-    "sqladmin.googleapis.com/Instance"
-]
+
+applies_to = ["sqladmin.googleapis.com/Instance"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.settings.userLabels
 
 #####
@@ -36,16 +35,17 @@ labels = resource.settings.userLabels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if non-ssl connections are allowed
-valid = true {
-  resource.settings.ipConfiguration.requireSsl == true
+valid {
+	resource.settings.ipConfiguration.requireSsl == true
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -53,23 +53,15 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    set_require_ssl
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [set_require_ssl],
 }
 
 set_require_ssl = {
-    "method": "patch",
-    "params": {
-        "project": resource.project,
-        "instance": resource.name,
-        "body":  {
-          "settings": {
-            "ipConfiguration": {
-              "requireSsl": true
-            }
-          }
-        }
-    }
+	"method": "patch",
+	"params": {
+		"project": resource.project,
+		"instance": resource.name,
+		"body": {"settings": {"ipConfiguration": {"requireSsl": true}}},
+	},
 }

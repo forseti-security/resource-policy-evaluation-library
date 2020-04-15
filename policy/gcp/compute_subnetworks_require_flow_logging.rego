@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.compute_subnetworks_require_flow_logging
+
 import data.rpe.gcp.util as gcputil
 
 #####
@@ -21,15 +21,15 @@ import data.rpe.gcp.util as gcputil
 #####
 
 description = "Require flow logging for subnetworks"
-applies_to = [
-  "compute.googleapis.com/Subnetwork"
-]
+
+applies_to = ["compute.googleapis.com/Subnetwork"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -37,16 +37,17 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if flow logs are enabled
-valid = true {
-  resource.enableFlowLogs == true
+valid {
+	resource.enableFlowLogs == true
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -54,21 +55,19 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    enable_flow_logging
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [enable_flow_logging],
 }
 
 enable_flow_logging = {
-    "method": "patch",
-    "params": {
-        "project": gcputil.resource_from_collection_path(resource.selfLink, "projects"),
-        "region": gcputil.resource_from_collection_path(resource.selfLink, "regions"),
-        "subnetwork": resource.name,
-        "body":  {
-            "enableFlowLogs": true,
-            "fingerprint": resource.fingerprint
-        }
-    }
+	"method": "patch",
+	"params": {
+		"project": gcputil.resource_from_collection_path(resource.selfLink, "projects"),
+		"region": gcputil.resource_from_collection_path(resource.selfLink, "regions"),
+		"subnetwork": resource.name,
+		"body": {
+			"enableFlowLogs": true,
+			"fingerprint": resource.fingerprint,
+		},
+	},
 }

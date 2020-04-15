@@ -19,15 +19,15 @@ package rpe.policy.appengine_instances_disallow_debug_mode
 #####
 
 description = "Disallow the use of debug mode on AppEngine Flex instances"
-applies_to = [
-  "appengine.googleapis.com/Instance"
-]
+
+applies_to = ["appengine.googleapis.com/Instance"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -35,31 +35,30 @@ labels = resource.labels
 #####
 
 default valid = true
+
 default excluded = false
 
 valid = false {
-    resource.vmDebugEnabled == true
+	resource.vmDebugEnabled == true
 }
 
 #####
- # Remediation
- #####
+# Remediation
+#####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    delete_instance
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [delete_instance],
 }
 
 delete_instance = {
-    "method": "delete",
-    "params": {
-        "appsId": name_parts[1],
-        "servicesId": name_parts[3],
-        "versionsId": name_parts[5],
-        "instancesId": name_parts[7]
-    }
+	"method": "delete",
+	"params": {
+		"appsId": name_parts[1],
+		"servicesId": name_parts[3],
+		"versionsId": name_parts[5],
+		"instancesId": name_parts[7],
+	},
 }
 
 name_parts = split(resource.name, "/")

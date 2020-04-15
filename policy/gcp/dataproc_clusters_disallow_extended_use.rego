@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.dataproc_clusters_disallow_extended_use
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.dataproc_clusters_disallow_extended_use
 #####
 
 description = "Disallow extended use of dataproc cluster"
-applies_to = [
-    "dataproc.googleapis.com/Cluster"
-]
+
+applies_to = ["dataproc.googleapis.com/Cluster"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,31 +35,30 @@ labels = resource.labels
 #####
 
 default valid = false
-default excluded = false
 
+default excluded = false
 
 # Max age for cluster in nanoseconds is configured in policy/config.yaml - dataproc:cluster_max_age_ns
 # by default is equel to 60 days (5184000000000000 ns)
 
 # Check if cluster was created earlier than cluster_max_age_ns
-valid = true {
-    creationTime := [ creationTime | resource.statusHistory[i].state == "CREATING"; creationTime := resource.statusHistory[i].stateStartTime ]
-    time.now_ns() - time.parse_rfc3339_ns(creationTime[0]) < data.config.gcp.dataproc.cluster_max_age_ns
+valid {
+	creationTime := [creationTime | resource.statusHistory[i].state == "CREATING"; creationTime := resource.statusHistory[i].stateStartTime]
+	time.now_ns() - time.parse_rfc3339_ns(creationTime[0]) < data.config.gcp.dataproc.cluster_max_age_ns
 }
 
-valid = true {
-    #Check creation date if cluster is in CREATING state now (in case of network or other issues it can be hanging for a long time)
-    creationTime := [ creationTime | resource.status.state == "CREATING"; creationTime := resource.status.stateStartTime ]
-    time.now_ns() - time.parse_rfc3339_ns(creationTime[0]) < data.config.gcp.dataproc.cluster_max_age_ns
+valid {
+	#Check creation date if cluster is in CREATING state now (in case of network or other issues it can be hanging for a long time)
+	creationTime := [creationTime | resource.status.state == "CREATING"; creationTime := resource.status.stateStartTime]
+	time.now_ns() - time.parse_rfc3339_ns(creationTime[0]) < data.config.gcp.dataproc.cluster_max_age_ns
 }
 
-excluded = true {
-  # Also, make sure this resource isn't excluded by label
-  data.exclusions.label_exclude(labels)
+excluded {
+	# Also, make sure this resource isn't excluded by label
+	data.exclusions.label_exclude(labels)
 }
 
 #####
 # Remediation
 #####
-
 # No remediation for old clusters

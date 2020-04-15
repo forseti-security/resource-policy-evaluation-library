@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.container_clusters_disallow_legacy_abac
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.container_clusters_disallow_legacy_abac
 #####
 
 description = "Disallow the use of legacy abac for GKE clusters"
-applies_to = [
-  "container.googleapis.com/Cluster"
-]
+
+applies_to = ["container.googleapis.com/Cluster"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,15 +35,16 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if legacy ABAC is enabled
-valid = true {
-  not resource.legacyAbac.enabled
+valid {
+	not resource.legacyAbac.enabled
 }
 
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -52,21 +52,19 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    disable_legacy_abac
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [disable_legacy_abac],
 }
 
 disable_legacy_abac = {
-    "method": "setLegacyAbac",
-    "params": {
-        "name": combinedName,
-        "body":  {
-            "name": combinedName,
-            "enabled": false
-        }
-    }
+	"method": "setLegacyAbac",
+	"params": {
+		"name": combinedName,
+		"body": {
+			"name": combinedName,
+			"enabled": false,
+		},
+	},
 }
 
 # break out the selfLink so we can extract the project, region and name

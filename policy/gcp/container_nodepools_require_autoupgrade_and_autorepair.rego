@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.container_nodepools_require_autoupgrade_and_autorepair
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.container_nodepools_require_autoupgrade_and_autorepair
 #####
 
 description = "Require that nodepools have auto-upgrade and auto-repair enabled"
-applies_to = [
-  "container.googleapis.com/NodePool"
-]
+
+applies_to = ["container.googleapis.com/NodePool"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,15 +35,16 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
-valid = true {
-  resource.management.autoRepair == true
-  resource.management.autoUpgrade == true
+valid {
+	resource.management.autoRepair == true
+	resource.management.autoUpgrade == true
 }
 
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -52,24 +52,22 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    enable_node_auto_repair_upgrade
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [enable_node_auto_repair_upgrade],
 }
 
 enable_node_auto_repair_upgrade = {
-    "method": "setManagement",
-    "params": {
-        "name": combinedName,
-        "body":  {
-            "name": combinedName,
-            "management": {
-              "autoRepair": true,
-              "autoUpgrade": true
-            }
-        }
-    }
+	"method": "setManagement",
+	"params": {
+		"name": combinedName,
+		"body": {
+			"name": combinedName,
+			"management": {
+				"autoRepair": true,
+				"autoUpgrade": true,
+			},
+		},
+	},
 }
 
 # break out the selfLink so we can extract the project, region, cluster and name

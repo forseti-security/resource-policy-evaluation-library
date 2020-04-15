@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.container_nodepools_require_cos_image
 
 #####
@@ -20,15 +19,15 @@ package rpe.policy.container_nodepools_require_cos_image
 #####
 
 description = "Require nodepools to use the Container-Optimized OS images"
-applies_to = [
-  "container.googleapis.com/Cluster"
-]
+
+applies_to = ["container.googleapis.com/Cluster"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -36,16 +35,17 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if COS image is being used
-valid = true {
-  count(_invalid_nodepools) == 0
+valid {
+	count(_invalid_nodepools) == 0
 }
 
 # Check for a global exclusion based on resource labels
-excluded = true {
-  data.exclusions.label_exclude(labels)
+excluded {
+	data.exclusions.label_exclude(labels)
 }
 
 #####
@@ -53,36 +53,33 @@ excluded = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": use_cos_image
+	"_remediation_spec": "v2beta1",
+	"steps": use_cos_image,
 }
 
 # iterate steps over invalid nodePools (can be updated one at a time)
 use_cos_image = result {
-  result := { combined | combined := {
-      "method": "update",
-      "params": {
-        "name": combinedName,
-        "body": {
-          "update": {
-            "desiredNodePoolId": _invalid_nodepools[_],
-            "desiredImageType": "COS"
-          }
-        }
-      }
-    }
-  }
+	result := {combined | combined := {
+		"method": "update",
+		"params": {
+			"name": combinedName,
+			"body": {"update": {
+				"desiredNodePoolId": _invalid_nodepools[_],
+				"desiredImageType": "COS",
+			}},
+		},
+	}}
 }
 
 _allowed_image_types = {"COS", "COS_CONTAINERD"}
 
-_all_nodepools = { name |
-  name := resource.nodePools[_].name
+_all_nodepools = {name |
+	name := resource.nodePools[_].name
 }
 
-_valid_nodepools = { name |
-  resource.nodePools[p].config.imageType = _allowed_image_types[_];
-  name := resource.nodePools[p].name
+_valid_nodepools = {name |
+	resource.nodePools[p].config.imageType = _allowed_image_types[_]
+	name := resource.nodePools[p].name
 }
 
 _invalid_nodepools = _all_nodepools - _valid_nodepools

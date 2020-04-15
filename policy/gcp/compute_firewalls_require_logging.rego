@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package rpe.policy.compute_firewalls_require_logging
+
 import data.rpe.gcp.util as gcputil
 
 #####
@@ -21,15 +21,15 @@ import data.rpe.gcp.util as gcputil
 #####
 
 description = "Require logging for firewall rules"
-applies_to = [
-  "compute.googleapis.com/Firewall"
-]
+
+applies_to = ["compute.googleapis.com/Firewall"]
 
 #####
 # Resource metadata
 #####
 
 resource = input.resource
+
 labels = resource.labels
 
 #####
@@ -37,16 +37,17 @@ labels = resource.labels
 #####
 
 default valid = false
+
 default excluded = false
 
 # Check if Logging is enabled
-valid = true {
-  resource.logConfig.enable = true
+valid {
+	resource.logConfig.enable = true
 }
 
 # Check if firewall is disabled
-valid = true {
-  resource.disabled
+valid {
+	resource.disabled
 }
 
 #####
@@ -54,21 +55,15 @@ valid = true {
 #####
 
 remediate = {
-  "_remediation_spec": "v2beta1",
-  "steps": [
-    enable_logging
-  ]
+	"_remediation_spec": "v2beta1",
+	"steps": [enable_logging],
 }
 
 enable_logging = {
-    "method": "patch",
-    "params": {
-        "project": gcputil.resource_from_collection_path(resource.selfLink, "projects"),
-        "firewall": resource.name,
-        "body":  {
-            "logConfig": {
-              "enable": true
-            }
-        }
-    }
+	"method": "patch",
+	"params": {
+		"project": gcputil.resource_from_collection_path(resource.selfLink, "projects"),
+		"firewall": resource.name,
+		"body": {"logConfig": {"enable": true}},
+	},
 }
