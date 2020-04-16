@@ -14,8 +14,8 @@
 
 package rpe.policy.container_nodepools_require_cos_image
 
-test_valid_policies {
-	valid with input.resource as {
+test_compliant_policies {
+	compliant with input.resource as {
 		"labels": {},
 		"nodePools": [
 			{
@@ -30,8 +30,8 @@ test_valid_policies {
 	}
 }
 
-test_invalid_policies {
-	not valid with input.resource as {
+test_noncompliant_policies {
+	not compliant with input.resource as {
 		"labels": {},
 		"nodePools": [
 			{

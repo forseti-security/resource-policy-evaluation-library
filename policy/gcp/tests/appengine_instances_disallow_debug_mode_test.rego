@@ -15,9 +15,9 @@
 package rpe.policy.appengine_instances_disallow_debug_mode
 
 test_vmDebugEnabled_disabled {
-	valid with input.resource as {"vmDebugEnabled": false}
+	compliant with input.resource as {"vmDebugEnabled": false}
 }
 
 test_vmDebugEnabled_enabled {
-	not valid with input.resource as {"vmDebugEnabled": true}
+	not compliant with input.resource as {"vmDebugEnabled": true}
 }

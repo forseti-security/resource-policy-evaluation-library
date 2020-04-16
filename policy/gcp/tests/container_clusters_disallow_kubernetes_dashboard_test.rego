@@ -14,15 +14,15 @@
 
 package rpe.policy.container_clusters_disallow_kubernetes_dashboard
 
-test_valid_policies {
-	valid with input.resource as {
+test_compliant_policies {
+	compliant with input.resource as {
 		"labels": {},
 		"addonsConfig": {"kubernetesDashboard": {"disabled": true}},
 	}
 }
 
-test_invalid_policies {
-	not valid with input.resource as {
+test_noncompliant_policies {
+	not compliant with input.resource as {
 		"labels": {},
 		"addonsConfig": {"kubernetesDashboard": {"disabled": false}},
 	}

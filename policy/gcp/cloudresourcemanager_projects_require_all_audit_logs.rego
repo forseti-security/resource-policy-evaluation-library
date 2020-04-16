@@ -36,11 +36,11 @@ labels = resource.settings.userLabels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
-valid {
+compliant {
 	# If there is only 1 auditConfig entry, and it enables all logs for allServices, this requirement is met
 	count(iam.auditConfigs) = 1
 	iam.auditConfigs[entry].service = "allServices"

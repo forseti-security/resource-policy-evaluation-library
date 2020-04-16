@@ -34,17 +34,17 @@ labels = resource.settings.userLabels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if backups are enabled
-valid {
+compliant {
 	resource.settings.backupConfiguration.enabled == true
 }
 
 # If this is a replica, you can't enable backups
-valid {
+compliant {
 	resource.replicaConfiguration
 }
 

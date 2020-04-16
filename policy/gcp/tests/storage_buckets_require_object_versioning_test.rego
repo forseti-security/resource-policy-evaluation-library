@@ -15,11 +15,11 @@
 package rpe.policy.storage_buckets_require_object_versioning
 
 test_versioning_enabled {
-	valid with input.resource as {"versioning": {"enabled": true}, "labels": {}}
+	compliant with input.resource as {"versioning": {"enabled": true}, "labels": {}}
 }
 
 test_versioning_disabled {
-	not valid with input.resource as {"versioning": {"enabled": false}, "labels": {}}
+	not compliant with input.resource as {"versioning": {"enabled": false}, "labels": {}}
 }
 
 test_exclusion_labels {

@@ -14,10 +14,10 @@
 
 package rpe.policy.compute_subnets_require_private_google_access
 
-test_valid_policies {
-	valid with input.resource as {"privateIpGoogleAccess": true}
+test_compliant_policies {
+	compliant with input.resource as {"privateIpGoogleAccess": true}
 }
 
-test_invalid_policies {
-	not valid with input.resource as {"privateIpGoogleAccess": false}
+test_noncompliant_policies {
+	not compliant with input.resource as {"privateIpGoogleAccess": false}
 }

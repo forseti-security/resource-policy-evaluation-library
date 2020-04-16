@@ -34,13 +34,13 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if COS image is being used
-valid {
-	count(_invalid_nodepools) == 0
+compliant {
+	count(_noncompliant_nodepools) == 0
 }
 
 # Check for a global exclusion based on resource labels
@@ -57,14 +57,14 @@ remediate = {
 	"steps": use_cos_image,
 }
 
-# iterate steps over invalid nodePools (can be updated one at a time)
+# iterate steps over noncompliant nodePools (can be updated one at a time)
 use_cos_image = result {
 	result := {combined | combined := {
 		"method": "update",
 		"params": {
 			"name": combinedName,
 			"body": {"update": {
-				"desiredNodePoolId": _invalid_nodepools[_],
+				"desiredNodePoolId": _noncompliant_nodepools[_],
 				"desiredImageType": "COS",
 			}},
 		},
@@ -77,12 +77,12 @@ _all_nodepools = {name |
 	name := resource.nodePools[_].name
 }
 
-_valid_nodepools = {name |
+_compliant_nodepools = {name |
 	resource.nodePools[p].config.imageType = _allowed_image_types[_]
 	name := resource.nodePools[p].name
 }
 
-_invalid_nodepools = _all_nodepools - _valid_nodepools
+_noncompliant_nodepools = _all_nodepools - _compliant_nodepools
 
 # break out the selfLink so we can extract the project, region, cluster and name
 selfLinkParts = split(resource.selfLink, "/")

@@ -36,12 +36,12 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if flow logs are enabled
-valid {
+compliant {
 	resource.enableFlowLogs == true
 }
 

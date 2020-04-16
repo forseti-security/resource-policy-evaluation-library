@@ -14,15 +14,15 @@
 
 package rpe.policy.dataproc_clusters_require_stackdriver_logging
 
-test_valid_policies {
-	valid with input.resource as {
+test_compliant_policies {
+	compliant with input.resource as {
 		"labels": {},
 		"config": {"softwareConfig": {"properties": {"dataproc:dataproc.logging.stackdriver.enable": "true"}}},
 	}
 }
 
-test_invalid_policies {
-	not valid with input.resource as {
+test_noncompliant_policies {
+	not compliant with input.resource as {
 		"labels": {},
 		"config": {"softwareConfig": {"properties": {"dataproc:dataproc.logging.stackdriver.enable": "false"}}},
 	}

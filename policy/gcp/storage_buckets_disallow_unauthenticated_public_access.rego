@@ -36,12 +36,12 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = true
+default compliant = true
 
 default excluded = false
 
 # Check if there is a binding for *allUsers*
-valid = false {
+compliant = false {
 	iam.bindings[_].members[_] == "allUsers"
 }
 

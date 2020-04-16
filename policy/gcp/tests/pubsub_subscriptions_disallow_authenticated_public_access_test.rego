@@ -14,8 +14,8 @@
 
 package rpe.policy.pubsub_subscriptions_disallow_authenticated_public_access
 
-test_valid_policies {
-	valid with input.iam as {
+test_compliant_policies {
+	compliant with input.iam as {
 		"bindings": [{
 			"role": "roles/storage.legacyBucketReader",
 			"members": ["your_user@your_org.tld"],
@@ -24,8 +24,8 @@ test_valid_policies {
 	}
 }
 
-test_invalid_policies {
-	not valid with input.iam as {
+test_noncompliant_policies {
+	not compliant with input.iam as {
 		"bindings": [{
 			"role": "roles/storage.legacyBucketReader",
 			"members": ["allAuthenticatedUsers"],

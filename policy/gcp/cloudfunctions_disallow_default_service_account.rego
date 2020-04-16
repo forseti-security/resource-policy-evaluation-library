@@ -34,12 +34,12 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if default service account is not used
-valid {
+compliant {
 	resource.serviceAccountEmail != serviceAccountEmail
 }
 

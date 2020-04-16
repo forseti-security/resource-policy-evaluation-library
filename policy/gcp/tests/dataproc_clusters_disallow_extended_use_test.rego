@@ -14,17 +14,17 @@
 
 package rpe.policy.dataproc_clusters_disallow_extended_use
 
-test_valid_new_cluster {
-	valid with input.resource as {"statusHistory": [{
+test_compliant_new_cluster {
+	compliant with input.resource as {"statusHistory": [{
 		"state": "CREATING",
 		"stateStartTime": sprintf("%04d-%02d-%02dT00:00:00.000Z", time.date(time.now_ns())),
 	}]}
 }
 
-test_invalid_old_cluster {
+test_noncompliant_old_cluster {
 	# 365 * 24 * 60 * 60 * 1000000000 = 1y in ns
 
-	not valid with input.resource as {"statusHistory": [{
+	not compliant with input.resource as {"statusHistory": [{
 		"state": "CREATING",
 		"stateStartTime": sprintf("%04d-%02d-%02dT00:00:00.000Z", time.date(time.now_ns() - ((((365 * 24) * 60) * 60) * 1000000000))),
 	}]}

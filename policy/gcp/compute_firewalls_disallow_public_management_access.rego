@@ -39,12 +39,12 @@ bad_tcp_ports = [22, 3389]
 # Policy evaluation
 #####
 
-default valid = true
+default compliant = true
 
 default excluded = false
 
 # Check if public access is enabled for everything
-valid = false {
+compliant = false {
 	resource.direction == "INGRESS"
 	resource.sourceRanges[_] == "0.0.0.0/0"
 	resource.allowed[rule_id].IPProtocol == "all"
@@ -52,7 +52,7 @@ valid = false {
 }
 
 # Check if public access is enabled for a bad TCP port
-valid = false {
+compliant = false {
 	resource.direction == "INGRESS"
 	resource.sourceRanges[_] == "0.0.0.0/0"
 	has_bad_tcp_port

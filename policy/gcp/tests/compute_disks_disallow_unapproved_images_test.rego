@@ -14,16 +14,16 @@
 
 package rpe.policy.compute_disks_disallow_unapproved_images
 
-test_valid_policies {
-	valid with input.resource as {
+test_compliant_policies {
+	compliant with input.resource as {
 		"labels": {},
 		"sourceImage": "https://www.googleapis.com/compute/v1/projects/my-project-id/global/images/project-ubuntu-1804",
 	}
 		 with data.config.gcp.compute.harden_image_project as "my-project-id"
 }
 
-test_invalid_policies {
-	not valid with input.resource as {
+test_noncompliant_policies {
+	not compliant with input.resource as {
 		"labels": {},
 		"sourceImage": "https://www.googleapis.com/compute/v1/projects/not-approved-project/global/images/project-ubuntu-1804",
 	}

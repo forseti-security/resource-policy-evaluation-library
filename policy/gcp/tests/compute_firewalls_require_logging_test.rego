@@ -15,17 +15,17 @@
 package rpe.policy.compute_firewalls_require_logging
 
 test_logs_good_enabled {
-	valid with input.resource as {"logConfig": {"enable": true}}
+	compliant with input.resource as {"logConfig": {"enable": true}}
 }
 
 test_logs_good_disabled {
-	valid with input.resource as {"logConfig": {"enable": true}, "disabled": "true"}
+	compliant with input.resource as {"logConfig": {"enable": true}, "disabled": "true"}
 }
 
 test_logs_bad_enabled {
-	not valid with input.resource as {"logConfig": {"enable": false}}
+	not compliant with input.resource as {"logConfig": {"enable": false}}
 }
 
 test_logs_bad_disabled {
-	valid with input.resource as {"logConfig": {"enable": false}, "disabled": "true"}
+	compliant with input.resource as {"logConfig": {"enable": false}, "disabled": "true"}
 }

@@ -34,11 +34,11 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
-valid {
+compliant {
 	resource.management.autoRepair == true
 	resource.management.autoUpgrade == true
 }

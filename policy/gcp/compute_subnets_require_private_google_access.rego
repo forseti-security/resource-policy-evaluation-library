@@ -36,12 +36,12 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if accessing Google services without external IP is enabled
-valid {
+compliant {
 	resource.privateIpGoogleAccess == true
 }
 

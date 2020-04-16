@@ -14,15 +14,15 @@
 
 package rpe.policy.bigtable_instances_disallow_authenticated_public_access
 
-test_valid_policies {
-	valid with input as {"iam": {"bindings": [{
+test_compliant_policies {
+	compliant with input as {"iam": {"bindings": [{
 		"role": "roles/cloudfunctions.invoker",
 		"members": ["your_user@your_org.tld"],
 	}]}}
 }
 
-test_invalid_policies {
-	not valid with input as {"iam": {"bindings": [{
+test_noncompliant_policies {
+	not compliant with input as {"iam": {"bindings": [{
 		"role": "roles/storage.legacyBucketReader",
 		"members": ["allAuthenticatedUsers"],
 	}]}}

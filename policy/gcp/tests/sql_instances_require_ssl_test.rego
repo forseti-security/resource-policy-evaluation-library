@@ -15,14 +15,14 @@
 package rpe.policy.sql_instances_require_ssl
 
 test_enabled {
-	valid with input.resource as {"settings": {
+	compliant with input.resource as {"settings": {
 		"ipConfiguration": {"requireSsl": true},
 		"userLabels": {},
 	}}
 }
 
 test_disabled {
-	not valid with input.resource as {"settings": {
+	not compliant with input.resource as {"settings": {
 		"ipConfiguration": {"requireSsl": false},
 		"userLabels": {},
 	}}

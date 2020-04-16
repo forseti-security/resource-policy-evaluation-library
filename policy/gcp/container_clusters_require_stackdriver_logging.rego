@@ -34,12 +34,12 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if logging service is enabled (either legacy or k8s native)
-valid {
+compliant {
 	startswith(resource.loggingService, "logging.googleapis.com")
 }
 

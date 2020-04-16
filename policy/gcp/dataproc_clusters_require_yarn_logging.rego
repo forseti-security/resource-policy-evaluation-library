@@ -34,11 +34,11 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
-valid {
+compliant {
 	resource.config.softwareConfig.properties["dataproc:dataproc.logging.stackdriver.enable"] == "true"
 	resource.config.softwareConfig.properties["dataproc:dataproc.logging.stackdriver.job.yarn.container.enable"] == "true"
 	resource.config.softwareConfig.properties["dataproc:jobs.file-backed-output.enable"] == "true"

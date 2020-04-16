@@ -15,7 +15,7 @@
 package rpe.policy.compute_firewalls_disallow_public_management_access
 
 test_good_firewall_1 {
-	valid with input.resource as {
+	compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["203.0.113.0/29"],
 		"allowed": [{"IPProtocol": "tcp"}],
@@ -23,7 +23,7 @@ test_good_firewall_1 {
 }
 
 test_good_firewall_2 {
-	valid with input.resource as {
+	compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["203.0.113.0/29"],
 		"allowed": [{
@@ -34,7 +34,7 @@ test_good_firewall_2 {
 }
 
 test_good_firewall_disabled_1 {
-	valid with input.resource as {
+	compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["203.0.113.0/29"],
 		"allowed": [{"IPProtocol": "tcp"}],
@@ -43,7 +43,7 @@ test_good_firewall_disabled_1 {
 }
 
 test_good_firewall_disabled_2 {
-	valid with input.resource as {
+	compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["0.0.0.0/0"],
 		"allowed": [{
@@ -55,7 +55,7 @@ test_good_firewall_disabled_2 {
 }
 
 test_bad_firewall_all {
-	not valid with input.resource as {
+	not compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["0.0.0.0/0"],
 		"allowed": [{"IPProtocol": "all"}],
@@ -63,7 +63,7 @@ test_bad_firewall_all {
 }
 
 test_bad_firewall_tcp {
-	not valid with input.resource as {
+	not compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["0.0.0.0/0"],
 		"allowed": [{"IPProtocol": "tcp"}],
@@ -71,7 +71,7 @@ test_bad_firewall_tcp {
 }
 
 test_bad_firewall_ssh {
-	not valid with input.resource as {
+	not compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["0.0.0.0/0"],
 		"allowed": [{
@@ -82,7 +82,7 @@ test_bad_firewall_ssh {
 }
 
 test_bad_firewall_rdp {
-	not valid with input.resource as {
+	not compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["0.0.0.0/0"],
 		"allowed": [{
@@ -93,7 +93,7 @@ test_bad_firewall_rdp {
 }
 
 test_bad_firewall_ssh_in_range {
-	not valid with input.resource as {
+	not compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["0.0.0.0/0"],
 		"allowed": [{
@@ -104,7 +104,7 @@ test_bad_firewall_ssh_in_range {
 }
 
 test_bad_firewall_rdp_in_range {
-	not valid with input.resource as {
+	not compliant with input.resource as {
 		"direction": "INGRESS",
 		"sourceRanges": ["0.0.0.0/0"],
 		"allowed": [{

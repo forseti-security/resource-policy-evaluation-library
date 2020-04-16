@@ -34,11 +34,11 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = true
+default compliant = true
 
 default excluded = false
 
-valid = false {
+compliant = false {
 	resource.vmDebugEnabled == true
 }
 

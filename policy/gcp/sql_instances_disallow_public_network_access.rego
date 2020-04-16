@@ -34,11 +34,11 @@ labels = resource.settings.userLabels
 # Policy evaluation
 #####
 
-default valid = true
+default compliant = true
 
 default excluded = false
 
-valid = false {
+compliant = false {
 	resource.settings.ipConfiguration.authorizedNetworks[_].value == "0.0.0.0/0"
 }
 
@@ -60,12 +60,12 @@ remove_bad_acls = {
 	"params": {
 		"project": resource.project,
 		"instance": resource.name,
-		"body": {"settings": {"ipConfiguration": {"authorizedNetworks": _valid_authorized_networks}}},
+		"body": {"settings": {"ipConfiguration": {"authorizedNetworks": _compliant_authorized_networks}}},
 	},
 }
 
-# Remove any invalid authorized networks
-_valid_authorized_networks = [net |
+# Remove any noncompliant authorized networks
+_compliant_authorized_networks = [net |
 	net := resource.settings.ipConfiguration.authorizedNetworks[_]
 	net.value != "0.0.0.0/0"
 ]

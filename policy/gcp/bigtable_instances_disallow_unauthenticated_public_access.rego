@@ -36,12 +36,12 @@ iam = input.iam
 # Policy evaluation
 #####
 
-default valid = true
+default compliant = true
 
 default excluded = false
 
 # Check if there is a binding for *allUsers*
-valid = false {
+compliant = false {
 	# Check for bad policy
 	iam.bindings[_].members[_] == "allUsers"
 }

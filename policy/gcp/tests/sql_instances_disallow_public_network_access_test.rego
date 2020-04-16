@@ -15,14 +15,14 @@
 package rpe.policy.sql_instances_disallow_public_network_access
 
 test_good_acls {
-	valid with input.resource as {"settings": {
+	compliant with input.resource as {"settings": {
 		"ipConfiguration": {"authorizedNetworks": [{"value": "203.0.113.0/29"}]},
 		"userLabels": {},
 	}}
 }
 
 test_bad_acl {
-	not valid with input.resource as {"settings": {
+	not compliant with input.resource as {"settings": {
 		"ipConfiguration": {"authorizedNetworks": [{"value": "0.0.0.0/0"}]},
 		"userLabels": {},
 	}}

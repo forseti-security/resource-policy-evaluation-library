@@ -14,15 +14,15 @@
 
 package rpe.policy.dataproc_clusters_require_kerberos
 
-test_valid_policies {
-	valid with input.resource as {
+test_compliant_policies {
+	compliant with input.resource as {
 		"labels": {},
 		"config": {"securityConfig": {"kerberosConfig": {"enableKerberos": true}}},
 	}
 }
 
-test_invalid_policies {
-	not valid with input.resource as {
+test_noncompliant_policies {
+	not compliant with input.resource as {
 		"labels": {},
 		"config": {"securityConfig": {"kerberosConfig": {"enableKerberos": false}}},
 	}

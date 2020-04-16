@@ -34,12 +34,12 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if service account is used, if field is not set - default account was used
-valid {
+compliant {
 	resource.config.gceClusterConfig.serviceAccount
 }
 

@@ -34,7 +34,7 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
@@ -42,12 +42,12 @@ default excluded = false
 # by default is equel to 60 days (5184000000000000 ns)
 
 # Check if cluster was created earlier than cluster_max_age_ns
-valid {
+compliant {
 	creationTime := [creationTime | resource.statusHistory[i].state == "CREATING"; creationTime := resource.statusHistory[i].stateStartTime]
 	time.now_ns() - time.parse_rfc3339_ns(creationTime[0]) < data.config.gcp.dataproc.cluster_max_age_ns
 }
 
-valid {
+compliant {
 	#Check creation date if cluster is in CREATING state now (in case of network or other issues it can be hanging for a long time)
 	creationTime := [creationTime | resource.status.state == "CREATING"; creationTime := resource.status.stateStartTime]
 	time.now_ns() - time.parse_rfc3339_ns(creationTime[0]) < data.config.gcp.dataproc.cluster_max_age_ns

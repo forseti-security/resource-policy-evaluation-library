@@ -34,14 +34,14 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # approved project_id for images is configured in policy/config.yaml - instances.harden_images_project
 
 # Check if hardened image used
-valid {
+compliant {
 	contains(resource.sourceImage, concat("/", ["projects", data.config.gcp.compute.harden_images_project]))
 }
 

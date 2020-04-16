@@ -34,11 +34,11 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = true
+default compliant = true
 
 default excluded = false
 
-valid = false {
+compliant = false {
 	# Check for bad acl
 	resource.access[_].iamMember == "allUsers"
 }
@@ -65,18 +65,18 @@ remove_bad_bindings = {
 	},
 }
 
-# Return only valid acls using the function below
+# Return only compliant acls using the function below
 _access = [acl |
 	acl := resource.access[_]
-	_valid_acl(acl)
+	_compliant_acl(acl)
 ]
 
-_valid_acl(acl) {
+_compliant_acl(acl) {
 	# If the iamMember is anything other than "allUsers"
 	acl.iamMember != "allUsers"
 }
 
-_valid_acl(acl) {
+_compliant_acl(acl) {
 	# Or if there is no iamMember key
 	not acl.iamMember
 }

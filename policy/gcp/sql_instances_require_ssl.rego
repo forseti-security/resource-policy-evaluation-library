@@ -34,12 +34,12 @@ labels = resource.settings.userLabels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if non-ssl connections are allowed
-valid {
+compliant {
 	resource.settings.ipConfiguration.requireSsl == true
 }
 

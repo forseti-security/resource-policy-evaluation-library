@@ -36,17 +36,17 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if Logging is enabled
-valid {
+compliant {
 	resource.logConfig.enable = true
 }
 
 # Check if firewall is disabled
-valid {
+compliant {
 	resource.disabled
 }
 

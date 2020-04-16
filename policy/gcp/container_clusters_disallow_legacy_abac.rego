@@ -34,12 +34,12 @@ labels = resource.labels
 # Policy evaluation
 #####
 
-default valid = false
+default compliant = false
 
 default excluded = false
 
 # Check if legacy ABAC is enabled
-valid {
+compliant {
 	not resource.legacyAbac.enabled
 }
 

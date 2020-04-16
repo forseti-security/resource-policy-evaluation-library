@@ -14,16 +14,16 @@
 
 package rpe.policy.cloudfunctions_disallow_default_service_account
 
-test_valid_policies {
-	valid with input.resource as {
+test_compliant_policies {
+	compliant with input.resource as {
 		"labels": {},
 		"name": "projects/example-project/locations/us-central1/functions/example_function",
 		"serviceAccountEmail": "not-default-account@appspot.gserviceaccount.com",
 	}
 }
 
-test_invalid_policies {
-	not valid with input.resource as {
+test_noncompliant_policies {
+	not compliant with input.resource as {
 		"labels": {},
 		"name": "projects/example-project/locations/us-central1/functions/example_function",
 		"serviceAccountEmail": "example-project@appspot.gserviceaccount.com",

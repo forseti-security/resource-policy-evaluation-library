@@ -14,16 +14,16 @@
 
 package rpe.policy.dataproc_clusters_require_approved_image
 
-test_valid_policies {
-	valid with input.resource as {
+test_compliant_policies {
+	compliant with input.resource as {
 		"labels": {},
 		"config": {"masterConfig": {"imageUri": "https://www.googleapis.com/compute/beta/projects/my-project-id/global/images/image_name"}},
 	}
 		 with data.config.gcp.dataproc.harden_images_project as "my-project-id"
 }
 
-test_invalid_policies {
-	not valid with input.resource as {
+test_noncompliant_policies {
+	not compliant with input.resource as {
 		"labels": {},
 		"config": {"masterConfig": {"imageUri": "https://www.googleapis.com/compute/beta/projects/not-approved-project/global/images/image_name"}},
 	}

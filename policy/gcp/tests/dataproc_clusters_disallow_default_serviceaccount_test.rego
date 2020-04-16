@@ -14,15 +14,15 @@
 
 package rpe.policy.dataproc_clusters_disallow_default_serviceaccount
 
-test_valid_policies {
-	valid with input.resource as {
+test_compliant_policies {
+	compliant with input.resource as {
 		"labels": {},
 		"config": {"gceClusterConfig": {"serviceAccount": "dataproc_sa@my-project-id.iam.gserviceaccount.com"}},
 	}
 }
 
-test_invalid_policies {
-	not valid with input.resource as {
+test_noncompliant_policies {
+	not compliant with input.resource as {
 		"labels": {},
 		"config": {"gceClusterConfig": {}},
 	}
