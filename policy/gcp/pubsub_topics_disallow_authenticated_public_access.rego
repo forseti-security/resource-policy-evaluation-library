@@ -65,7 +65,7 @@ remove_bad_bindings = {
 	},
 }
 
-# Make a copy of the input, omitting the bindings
+# Make a copy of the policy, omitting the bindings
 _policy[key] = value {
 	key != "bindings"
 	iam[key] = value

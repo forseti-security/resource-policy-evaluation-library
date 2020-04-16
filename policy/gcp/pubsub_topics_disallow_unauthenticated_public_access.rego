@@ -60,15 +60,15 @@ remediate = {
 remove_bad_bindings = {
 	"method": "setIamPolicy",
 	"params": {
-		"resource": iam.name,
+		"resource": resource.name,
 		"body": {"policy": _policy},
 	},
 }
 
-# Make a copy of the input, omitting the bindings
+# Make a copy of the policy, omitting the bindings
 _policy[key] = value {
 	key != "bindings"
-	input[key] = value
+	iam[key] = value
 }
 
 # Now rebuild the bindings
