@@ -1,4 +1,4 @@
-# Copyright 2019 The resource-policy-evaluation-library Authors. All rights reserved.
+# Copyright 2020 The resource-policy-evaluation-library Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,24 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package exclusions
+package rpe.util
 
-#
-# Function to test if a resource label is present that marks the resource for exclusion
-# Exclusion labels should be defined in _data.config.exclusion.labels_ in your config.yaml file
-#
-# Example config:
-#
-# ---
-# config:
-#   exclusions:
-#     labels:
-#       forseti-enforcer: disable
-
-label_exclude(res_labels) {
-	res_labels[key] == data.config.exclusions.labels[key]
+# Check if an object has a given field
+has_field(object, field) {
+	object[field]
 }
 
+# Corner case where the value happens to be false
+else {
+	object[field] == false
+}
+
+# Default return value to false
 else = false {
 	true
 }

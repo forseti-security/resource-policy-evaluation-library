@@ -12,18 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package rpe
 
-package policies
+import data.rpe.util as util
 
-
-# Find all defined policies
-#
-# We should move the policies to a separate path under data at some point and
-# limit our walking to that prefix
-list = [ concat(".", paths) |
-    x := walk(data.gcp)
-    paths := x[0]
-    is_array(paths)
-    count(paths) > 2
-    paths[count(paths) - 2] == "policy"
+policies = [{
+	"policy_id": name,
+	"description": object.get(p, "description", ""),
+	"applies_to": p.applies_to,
+} |
+	p = data.rpe.policy[name]
 ]
+
+evaluate = [{
+	"policy_id": name,
+	"compliant": object.get(data.rpe.policy[name], "compliant", false),
+	"excluded": object.get(data.rpe.policy[name], "excluded", false),
+	"has_remediation": util.has_field(data.rpe.policy[name], "remediate"),
+} |
+	name := matched_policies[_]
+]
+
+matched_policies = sort([name |
+	p = data.rpe.policy[name]
+	input.type == p.applies_to[_]
+])
