@@ -11,7 +11,8 @@ The resource-policy-evaluation-library (rpe-lib) evaluates whether or not a give
 
 The library works on `resources` and expects a fairly simple interface to any resource you wish to evaluate policy on. It expects an object with the following functions defined:
 
-```
+```python
+
 class MyResource:
 
     # Returns the body of a given resource as a dictionary
@@ -42,7 +43,8 @@ The base class for resources is [GoogleAPIResource](https://github.com/forseti-s
 
 Below is an example of a resource definition:
 
-```
+```python
+
 class GcpGkeClusterNodepool(GoogleAPIResource):
 
     service_name = "container"
@@ -114,7 +116,8 @@ dictionary in the `factory()` function in [rpe/resources/gcp.py](https://github.
 with the `key: value` format as `service_name.resource_path: resource_class`. 
 Using the example above, the `key: value` pair would be:
  
-```
+```python
+
 resource_type_map = {
 	...
 'container.projects.locations.clusters.nodePools': GcpGkeClusterNodepool,
@@ -247,7 +250,8 @@ opa run --server ./policy/
 
 Now we need to create an RPE instance with the opa engine configured to use the local OPA server:
 
-```
+```python
+
 from rpe import RPE
 
 config = {
