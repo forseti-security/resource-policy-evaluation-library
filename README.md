@@ -1,62 +1,100 @@
 # resource-policy-evaluation-library
 
-The resource-policy-evaluation-library (rpe-lib) evaluates whether or not a given resource adheres to defined policies. It also attempts to remediate any policy violations.
+rpe-lib is made up of `Policy Engines (rpe.engines.Engine)` and `Resources (rpe.resources.Resource)`.
+
+`Resources` produce details about the current state of a given type of resource. A resource can be just about anything, but the initial goal of the project was to support Google Cloud Platform (GCP) resources. The implemention is intentionally generic to allow support for other resource types
+
+`Policy Engines` evaluate `Resources` against their configured policies. Given a resource, they can return a list of `Evaluations (rpe.policy.Evaluation)` indicating the name of each policy that applies to the resource (by resource type), and whether or not the resource is compliant. `Resource` also define a `remediate()` function, that should be able to take a dictionary description of how to manipulate a resource to make it compliant.
+
+As an example, for GCP resources, the `remediate()` function expects details about what method to call in the Google REST API for the given resource, and what parameters to pass. So for a Google Cloud Storage Bucket, a policy that enforces bucket versioning could define remediation as a call to the buckets `patch()` method with the appropriate arguments to enable versioning.
 
 [![Build Status](https://api.travis-ci.org/forseti-security/resource-policy-evaluation-library.svg?branch=master)](https://travis-ci.org/forseti-security/resource-policy-evaluation-library/)
 [![PyPI version](https://badge.fury.io/py/rpe-lib.svg)](https://badge.fury.io/py/rpe-lib)
 
 ---
 
+## Policy Engines
+
+There are currently 2 `Policy Engines` included with rpe-lib:
+
+### Open Policy Agent (opa) Engine
+
+The Open Policy Agent engine uses the Open Policy Agent REST API to evalute policy for a given resource. In order to use this engine, you'll need to run the opa server with the rpe-lib base policies, and whatever policies you'd like to evaluate and optionally enforce. The opa engine passes the result of `Resource.get()` to the opa server as input. All policies need to be defined in the `rpe.policy` namespace, include a few specific rules, and operate on the `input` document:
+
+* _applies\_to_: a list of resource types the policy applies to
+* _description_: a human-readable description of the policy
+* _compliant_: returns true if the resource defined in the `input` document adheres to the policy
+* _excluded_: returns true if there is a reason to exclude the resource from evaluation, for GCP we define resource labels that can mark a resource as excluded
+* _remediate (optional)_: returns a JSON object explaining how to remediate the resource for the given policy
+
+Example policy:
+
+```
+# This is a real policy included with rpe-lib though slightly simplified
+package rpe.policy.storage_buckets_require_object_versioning
+
+description = "Require object versioning for storage buckets"
+
+applies_to = ["storage.googleapis.com/Bucket"]
+
+default compliant = false
+
+default excluded = false
+
+compliant {
+        input.resource.versioning.enabled = true
+}
+
+excluded {
+        input.resource.labels["forseti-enforcer"] = "disabled"
+}
+
+remediate = {
+        "_remediation_spec": "v2",
+        "steps": [
+            "method": "patch",
+            "params": {
+                    "bucket": input.resource.name,
+                    "body": {"versioning": {"enabled": true}},
+            }
+        ]
+}
+```
+
+### Python Engine
+The OPA engine is very powerful, but is limited by what OPA is capable of. For use-cases that are more complicated, you might want to use the python engine. This engine expects the path to a python package that contains classes that perform the evaluation, and optionally remediation.
+
+As mentioned, the python policies are actually classes. Here is an example python policy class:
+
+```
+# Stubbed out example of the above OPA engine policy as a python engine policy
+class GCPBucketVersioningPolicy:
+    description = 'Require object versioning for storage buckets'
+    applies_to = ['cloudresourcemanager.googleapis.com/Project']
+
+    @classmethod
+    def compliant(cls, resource):
+        return resource.get()['resource']['versioning']['enabled'] == True
+
+    @classmethod
+    def excluded(cls, resource):
+        return resource.get()['resource']['labels']['forseti-enforcer'] == 'disabled'
+
+    @classmethod
+    def remediate(cls, resource):
+        # execute cloudfuntion to enable versioning,
+        # or shell execute gsutil,
+        # or anything you can do with python
+        pass
+```
+
 ## Resources
 
-The library works on `resources` and expects a fairly simple interface to any resource you wish to evaluate policy on. It expects an object with the following functions defined:
+`Resources` must define the following functions
 
-```
-class MyResource:
-
-    # Returns the body of a given resource as a dictionary
-    def get(self):
-        pass
-
-    # Takes a remediation spec and attempts to remediate a resource
-    def remediate(self, remediation):
-        pass
-
-    # Returns the resource type as a string
-    #  Note: This should be a dotted-string that the engines will use to determine what policies are relevant
-    type(self):
-        pass
-```
-
-Some resources are provided with rpe-lib, and hopefully that will continue to grow, but it's not required that you use the provided resource classes.
-
-## Engines
-
-Policy evaluation/enforcement is handled by the _policy engines_:
-
-### Open Policy Agent Engine
-
-The OPA engine evaluates policy against resources using an [Open Policy Agent](https://www.openpolicyagent.org/) server. Policies need to be namespaced properly for the OPA Engine to locate them, and evaluate policy properly. Note: This won't work in cases where policy enforcement is more complicated that minor edits to the body of the resource. All remediation is implemented in OPA's policy language `Rego`.
-
-The policies should be namespaced as `<resource.type()>.policy.<policy_name>`. For example, the `micromanager.resources.gcp.GcpSqlInstance` resource has a type of `gcp.sqladmin.instances`, so a policy requiring backups to be enabled might be namespaced `gcp.sqladmin.instances.policy.backups`. The policy should implement the following rules:
-
-* `valid`: <boolean>. Returns true if the provided resource adheres to the policy
-* `remediate`: <object>. Returns the `input` resource altered to adhere to policy
-
-For each resource.type() you also need to define a `policies` rule and a `violations` rule. This allows the OPA engine to query all violations for a given resource type in a single API call. These probably wont need to change, other than the package name, and look like this (again with the `micromanager.resources.gcp.GcpSqlInstance` example):
-
-```
-package gcp.sqladmin.instances
-
-policies [policy_name] {
-    policy := data.gcp.sqladmin.instances.policy[policy_name]
-}
-
-violations [policy_name] {
-    policy := data.gcp.sqladmin.instances.policy[policy_name]
-    policy.valid != true
-}
-```
+* `get()`: returns metadata describing the current state of the resource
+* `remediate(remediation_spec)`: applies the remediation (the spec is specific to the resource type/implementation)
+* `type()`: returns the type of resource, used by policy engines to determine which policies apply to a given resource
 
 ## Examples
 
@@ -71,8 +109,9 @@ opa run --server ./policy/
 
 Now we need to create an RPE instance with the opa engine configured to use the local OPA server:
 
-```
+```python
 from rpe import RPE
+from rpe.resources import GoogleAPIResource
 
 config = {
     'policy_engines': [
@@ -83,27 +122,26 @@ config = {
     ]
 }
 
-# Create a resource object with details about the resource we want to evaluate
-res = Resource.factory(
-  'gcp',
-  {
-    'resource_name':'my-sql-instance-name',
-    'project_id':'my-gcp-project',
-    'resource_type':'sqladmin.instances'
-  },
-  credentials=<gcp-credentials>
+rpe = RPE(config)
+
+# Create a resource object for the resource we want to evaluate
+res = GoogleAPIResource.from_cai_data(
+    '//storage.googleapis.com/my-test-bucket',
+    'storage.googleapis.com/Bucket',
+    project_id='my-test-project',
 )
 
-rpe = RPE(config)
-violations = rpe.violations(res)
+evals = rpe.evaluate(res)
 
-for (engine, violation) in violations:
-    print(engine, violation)
-    engine.remediate(res, violation)
+for e in evals:
+    print(f'Policy: {e.policy_id}, Compliant: {e.compliant}')
+
+    if not e.compliant and e.remediable:
+        e.remediate()
 ```
 
 
 
-# Uses
+# Applications using rpe-lib
 
 * [Forseti Real-time Enforcer](https://github.com/forseti-security/real-time-enforcer) - The Forseti Real-time enforcer uses rpe-lib for the evaluation and enforcement of policy for Google Cloud resources. It uses a Stackdriver log export to a Pub/Sub topic to trigger enforcement.
