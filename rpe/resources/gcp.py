@@ -100,41 +100,28 @@ class GoogleAPIResource(Resource):
 
         return resource_data
 
+    @classmethod
+    def subclass_by_type(cls, resource_type):
+        mapper = {
+            res_cls.cai_type: res_cls
+
+            for res_cls in cls.__subclasses__()
+        }
+
+        try:
+            return mapper[resource_type]
+        except KeyError:
+            raise ResourceException('Unrecognized resource type: {}'.format(resource_type))
+
+    @classmethod
+    def from_resource_data(cls, *, resource_type, client_kwargs={}, **resource_data):
+        res_cls = cls.subclass_by_type(resource_type)
+        return res_cls(client_kwargs=client_kwargs, **resource_data)
+
     @staticmethod
     def from_cai_data(resource_name, resource_type, project_id=None, client_kwargs={}):
 
-        # Mapping of the resource types defined by CAI and our classes
-        resource_type_map = {
-            # App Engine instances show up as compute instances in CAI exports. We've chosen to
-            # define our own asset_type and do some munging outside of rpelib
-            'appengine.googleapis.com/Instance': GcpAppEngineInstance,
-
-            'bigquery.googleapis.com/Dataset': GcpBigqueryDataset,
-            'bigtableadmin.googleapis.com/Instance': GcpBigtableInstance,
-
-            # Cloudfunctions are not currently supported by CAI. We reached out to the CAI team
-            # to find out what the asset_type would likely be
-            'cloudfunctions.googleapis.com/CloudFunction': GcpCloudFunction,
-
-            'compute.googleapis.com/Instance': GcpComputeInstance,
-            'compute.googleapis.com/Disk': GcpComputeDisks,
-            'compute.googleapis.com/Subnetwork': GcpComputeSubnetwork,
-            'compute.googleapis.com/Firewall': GcpComputeFirewall,
-            'dataproc.googleapis.com/Cluster': GcpDataprocCluster,
-            'container.googleapis.com/Cluster': GcpGkeCluster,
-            'container.googleapis.com/NodePool': GcpGkeClusterNodepool,
-            'pubsub.googleapis.com/Subscription': GcpPubsubSubscription,
-            'pubsub.googleapis.com/Topic': GcpPubsubTopic,
-            'storage.googleapis.com/Bucket': GcpStorageBucket,
-            'sqladmin.googleapis.com/Instance': GcpSqlInstance,
-            'cloudresourcemanager.googleapis.com/Project': GcpProject,
-            'serviceusage.googleapis.com/Service': GcpProjectService,
-        }
-
-        if resource_type not in resource_type_map:
-            raise ResourceException('Unrecognized asset type: {}'.format(resource_type))
-
-        cls = resource_type_map.get(resource_type)
+        res_cls = GoogleAPIResource.subclass_by_type(resource_type)
 
         resource_data = GoogleAPIResource._extract_cai_name_data(resource_name)
 
@@ -142,7 +129,7 @@ class GoogleAPIResource(Resource):
         if project_id and 'project_id' not in resource_data:
             resource_data['project_id'] = project_id
 
-        return cls(
+        return res_cls(
             client_kwargs=client_kwargs,
             **resource_data
         )
