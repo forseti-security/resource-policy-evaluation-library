@@ -16,15 +16,18 @@
 import importlib.util
 import inspect
 
+from rpe.policy import Evaluation, Policy
+
 
 class PythonPolicyEngine:
+
+    _policies={}
+
     def __init__(self, package_path):
         self.package_path = package_path
-        self._load_module()
-        self._build_policy_map()
+        self._load_policies()
 
-    def _load_module(self):
-        """Todo: Make this to work on different python versions"""
+    def _load_policies(self):
         spec = importlib.util.spec_from_file_location(
             "pypol",
             "{}/__init__.py".format(self.package_path)
@@ -32,53 +35,48 @@ class PythonPolicyEngine:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-        self.module = module
+        for name, obj in inspect.getmembers(module):
+            if inspect.isclass(obj) and hasattr(obj, 'applies_to') and isinstance(obj.applies_to, list):
+                self._policies[name] = obj
 
-    def _build_policy_map(self):
-        """Loop through all classes that are part of this module and build a map
-        of policies by resource type
+    def policies(self):
         """
-        self.policy_map = {}
-        for name, obj in inspect.getmembers(self.module):
-            if inspect.isclass(obj):
-                if hasattr(obj, 'applies_to'):
-                    if isinstance(obj.applies_to, list):
-                        for resource_type in obj.applies_to:
-                            if resource_type not in self.policy_map:
-                                self.policy_map[resource_type] = []
-                            self.policy_map[resource_type].append(obj)
-
-    def configured_policies(self):
-        # adding for compatibility
-        # todo: implement me
-        return []
-
-    def policies(self, resource):
-        """
-        Args:
-            resource: The resource we'd like to evaluate
-
         Returns:
-            A list of names of policies that apply to the provided resource
-
+            A list of names of configured policies
         """
-        return self.policy_map[resource.type()]
 
-    def violations(self, resource):
-        """
-        Args:
-            resource: The resource we'd like to evaluate
+        policies = [
+            Policy(
+                policy_id=policy_name,
+                engine=self,
+                applies_to=policy_cls.applies_to,
+                description=policy_cls.description
+            )
+            for policy_name, policy_cls in self._policies.items()
+        ]
 
-        Returns:
-            A list of names of policies this resource violates
+        return policies
 
-        """
-        violations = []
-        for cls in self.policies(resource):
-            policy = cls(resource)
-            if not policy.evaluate():
-                violations.append(policy)
-        return violations
+    def evaluate(self, resource):
+        matched_policies = dict(filter(
+            lambda policy: resource.type() in policy[1].applies_to,
+            self._policies.items()
+        ))
 
-    def remediate(self, resource, violation):
-        violation.remediate(resource)
+        evals = [
+            Evaluation(
+                resource=resource,
+                engine=self,
+                policy_id=policy_name,
+                compliant=policy_cls.compliant(resource),
+                excluded=policy_cls.excluded(resource),
+                has_remediation=hasattr(policy_cls, 'remediate')
+            )
+            for policy_name,policy_cls in matched_policies.items()
+        ]
+
+        return evals
+
+    def remediate(self, resource, policy_id):
+        policy_cls = self._policies[policy_id]
+        policy_cls.remediate(resource)
