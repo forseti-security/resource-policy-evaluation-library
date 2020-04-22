@@ -19,7 +19,7 @@ class Evaluation:
     
     compliant: bool
     excluded: bool
-    has_remediation: bool
+    remediable: bool
 
     def remediate(self):
         return self.engine.remediate(self.resource, self.policy_id)

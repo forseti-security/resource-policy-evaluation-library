@@ -70,7 +70,7 @@ class PythonPolicyEngine:
                 policy_id=policy_name,
                 compliant=policy_cls.compliant(resource),
                 excluded=policy_cls.excluded(resource),
-                has_remediation=hasattr(policy_cls, 'remediate')
+                remediable=hasattr(policy_cls, 'remediate')
             )
             for policy_name,policy_cls in matched_policies.items()
         ]

@@ -28,7 +28,7 @@ evaluate = [{
 	"policy_id": name,
 	"compliant": object.get(data.rpe.policy[name], "compliant", false),
 	"excluded": object.get(data.rpe.policy[name], "excluded", false),
-	"has_remediation": util.has_field(data.rpe.policy[name], "remediate"),
+	"remediable": util.has_field(data.rpe.policy[name], "remediate"),
 } |
 	name := matched_policies[_]
 ]
