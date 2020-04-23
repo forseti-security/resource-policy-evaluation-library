@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 package exclusions
 
 #
@@ -27,6 +26,10 @@ package exclusions
 #     labels:
 #       forseti-enforcer: disable
 
-label_exclude(res_labels) = true {
-  res_labels[key] == data.config.exclusions.labels[key]
+label_exclude(res_labels) {
+	res_labels[key] == data.config.exclusions.labels[key]
+}
+
+else = false {
+	true
 }

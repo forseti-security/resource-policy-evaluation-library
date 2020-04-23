@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from .base import Engine                # noqa: F401
 from .opa import OpenPolicyAgent        # noqa: F401
 from .python import PythonPolicyEngine  # noqa: F401

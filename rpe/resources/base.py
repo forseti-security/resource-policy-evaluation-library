@@ -18,32 +18,21 @@ from abc import ABC, abstractmethod
 
 class Resource(ABC):
 
-    @staticmethod
-    def factory(platform, **kargs):
-        """ Return a resource from the appropriate platform """
-        from .gcp import GoogleAPIResource
-
-        resource_platform_map = {
-            'gcp': GoogleAPIResource
-        }
-
-        try:
-            resource = resource_platform_map[platform].factory(
-                **kargs
-            )
-        except KeyError:
-            raise AttributeError('Unrecognized platform')
-
-        return resource
-
+    # Returns a dictionary representing the resource. Must contain a 'type' key
+    # indicating what type of resource it is
     @abstractmethod
     def get(self):
         pass
 
+    # Performs remediation based on a json representation of how to remediate a
+    # resource that does not comply to a given policy. This allows for
+    # remediation from non-python based engines, such as the open-policy-agent
+    # engine
     @abstractmethod
     def remediate(self):
         pass
 
+    # Returns the resource type
     @abstractmethod
     def type(self):
         pass

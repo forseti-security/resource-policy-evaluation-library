@@ -19,6 +19,11 @@ from setuptools import setup
 
 setup(
     name="rpe-lib",
+    classifiers=[
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+    ],
     description="A resource policy evaluation library",
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
