@@ -71,7 +71,7 @@ class GoogleAPIResource(Resource):
 
     @staticmethod
     def _extract_cai_name_data(name):
-        ''' Attempt to get identifiable information out of resource_name '''
+        ''' Attempt to get identifiable information out of a Cloud Asset Inventory-formatted resource_name '''
 
         # Most resources need only a subset of these fields to query the google apis
         fields = {
@@ -103,7 +103,7 @@ class GoogleAPIResource(Resource):
     @classmethod
     def subclass_by_type(cls, resource_type):
         mapper = {
-            res_cls.cai_type: res_cls
+            res_cls.resource_type: res_cls
 
             for res_cls in cls.__subclasses__()
         }
@@ -120,6 +120,7 @@ class GoogleAPIResource(Resource):
 
     @staticmethod
     def from_cai_data(resource_name, resource_type, project_id=None, client_kwargs={}):
+        ''' Attempt to return the appropriate resource using Cloud Asset Inventory-formatted resource info '''
 
         res_cls = GoogleAPIResource.subclass_by_type(resource_type)
 
@@ -137,13 +138,13 @@ class GoogleAPIResource(Resource):
     def to_dict(self):
         details = self._resource_data.copy()
         details.update({
-            'cai_type': self.cai_type,
+            'resource_type': self.resource_type,
             'full_resource_name': self.full_resource_name(),
         })
         return details
 
     def type(self):
-        return self.cai_type
+        return self.resource_type
 
     # Google's documentation describes what it calls a 'full resource name' for
     # resources. None of the API's seem to implement it (except Cloud Asset
@@ -369,7 +370,7 @@ class GcpAppEngineInstance(GoogleAPIResource):
     readiness_key = 'vmStatus'
     readiness_value = 'RUNNING'
 
-    cai_type = 'appengine.googleapis.com/Instance'  # this is made-up based on existing appengine types
+    resource_type = 'appengine.googleapis.com/Instance'  # this is made-up based on existing appengine types
 
     required_resource_data = ['name', 'app', 'service', 'version']
 
@@ -392,7 +393,7 @@ class GcpBigqueryDataset(GoogleAPIResource):
 
     required_resource_data = ['name', 'project_id']
 
-    cai_type = "bigquery.googleapis.com/Dataset"
+    resource_type = "bigquery.googleapis.com/Dataset"
 
     def _get_request_args(self):
         return {
@@ -415,7 +416,7 @@ class GcpBigtableInstance(GoogleAPIResource):
 
     required_resource_data = ['name', 'project_id']
 
-    cai_type = "bigtableadmin.googleapis.com/Instance"
+    resource_type = "bigtableadmin.googleapis.com/Instance"
 
     def _get_request_args(self):
         return {
@@ -438,7 +439,7 @@ class GcpCloudFunction(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
-    cai_type = "cloudfunctions.googleapis.com/CloudFunction"  # unreleased
+    resource_type = "cloudfunctions.googleapis.com/CloudFunction"  # unreleased
 
     def _get_request_args(self):
         return {
@@ -468,7 +469,7 @@ class GcpComputeInstance(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
-    cai_type = "compute.googleapis.com/Instance"
+    resource_type = "compute.googleapis.com/Instance"
 
     def _get_request_args(self):
         return {
@@ -486,7 +487,7 @@ class GcpComputeDisks(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
-    cai_type = "compute.googleapis.com/Disk"
+    resource_type = "compute.googleapis.com/Disk"
 
     def _get_request_args(self):
         return {
@@ -504,7 +505,7 @@ class GcpComputeSubnetwork(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
-    cai_type = "compute.googleapis.com/Subnetwork"
+    resource_type = "compute.googleapis.com/Subnetwork"
 
     def _get_request_args(self):
         return {
@@ -522,7 +523,7 @@ class GcpComputeFirewall(GoogleAPIResource):
 
     required_resource_data = ['name', 'project_id']
 
-    cai_type = "compute.googleapis.com/Firewall"
+    resource_type = "compute.googleapis.com/Firewall"
 
     def _get_request_args(self):
         return {
@@ -539,7 +540,7 @@ class GcpDataprocCluster(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
-    cai_type = "dataproc.googleapis.com/Cluster"
+    resource_type = "dataproc.googleapis.com/Cluster"
 
     def _get_request_args(self):
         return {
@@ -560,7 +561,7 @@ class GcpGkeCluster(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
-    cai_type = "container.googleapis.com/Cluster"
+    resource_type = "container.googleapis.com/Cluster"
 
     def _get_request_args(self):
         return {
@@ -583,7 +584,7 @@ class GcpGkeClusterNodepool(GoogleAPIResource):
 
     required_resource_data = ['name', 'cluster', 'location', 'project_id']
 
-    cai_type = "container.googleapis.com/NodePool"  # beta
+    resource_type = "container.googleapis.com/NodePool"  # beta
 
     def _get_request_args(self):
         return {
@@ -609,7 +610,7 @@ class GcpPubsubSubscription(GoogleAPIResource):
         'iam': 'getIamPolicy',
     }
 
-    cai_type = "pubsub.googleapis.com/Subscription"
+    resource_type = "pubsub.googleapis.com/Subscription"
 
     def _get_request_args(self):
         return {
@@ -641,7 +642,7 @@ class GcpPubsubTopic(GoogleAPIResource):
         'iam': 'getIamPolicy',
     }
 
-    cai_type = "pubsub.googleapis.com/Topic"
+    resource_type = "pubsub.googleapis.com/Topic"
 
     def _get_request_args(self):
         return {
@@ -673,7 +674,7 @@ class GcpStorageBucket(GoogleAPIResource):
 
     required_resource_data = ['name']
 
-    cai_type = "storage.googleapis.com/Bucket"
+    resource_type = "storage.googleapis.com/Bucket"
 
     def _get_request_args(self):
         return {
@@ -690,7 +691,7 @@ class GcpSqlInstance(GoogleAPIResource):
     readiness_value = 'RUNNABLE'
     readiness_terminal_values = ['FAILED', 'MAINTENANCE', 'SUSPENDED', 'UNKNOWN_STATE']
 
-    cai_type = "sqladmin.googleapis.com/Instance"
+    resource_type = "sqladmin.googleapis.com/Instance"
 
     def _get_request_args(self):
         return {
@@ -709,7 +710,7 @@ class GcpProject(GoogleAPIResource):
         'iam': 'getIamPolicy',
     }
 
-    cai_type = "cloudresourcemanager.googleapis.com/Project"  # beta
+    resource_type = "cloudresourcemanager.googleapis.com/Project"  # beta
 
     def _get_request_args(self):
         return {
@@ -731,7 +732,7 @@ class GcpProjectService(GoogleAPIResource):
 
     required_resource_data = ['name', 'project_id']
 
-    cai_type = 'serviceusage.googleapis.com/Service'
+    resource_type = 'serviceusage.googleapis.com/Service'
 
     def _get_request_args(self):
         return {
