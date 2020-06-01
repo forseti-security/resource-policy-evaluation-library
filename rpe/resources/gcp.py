@@ -139,8 +139,13 @@ class GoogleAPIResource(Resource):
         details = self._resource_data.copy()
         details.update({
             'resource_type': self.resource_type,
-            'full_resource_name': self.full_resource_name(),
         })
+
+        try:
+            details['full_resource_name'] = self.full_resource_name()
+        except Exception:
+            details['full_resource_name'] = None
+
         return details
 
     def type(self):
