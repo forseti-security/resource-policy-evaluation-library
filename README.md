@@ -88,6 +88,23 @@ class GCPBucketVersioningPolicy:
         pass
 ```
 
+When you configure your RPE object, you provide the path to your python package. That package doesn't need to be installed, it will be loaded dynamically. The path you provide should contain an `__init__.py` file with every policy class you wish to use. These can be defined directly in that file, or imported. Since RPElib takes care of importing the package, you will be able to use relative imports in your python files. For example your directory structure might look like this:
+
+```
+/etc/rpe/policies-python
+* __init__.py
+* policy1.py
+* policy2.py
+```
+
+And your `__init__.py` might look like this:
+
+```python
+# __init__.py
+from .policy1 import MyFirstPythonPolicy
+from .policy2 import AnotherPythonPolicy, YetAnotherPolicy
+```
+
 ## Resources
 
 `Resources` must define the following functions
@@ -140,7 +157,54 @@ for e in evals:
         e.remediate()
 ```
 
+#### Using the Python engine
 
+Using the Python policy engine is similar to the above:
+
+```python
+from rpe import RPE
+from rpe.resources import GoogleAPIResource
+
+config = {
+    'policy_engines': [
+        {
+            'type': 'python',
+            'path': '/etc/rpe/policies-python'
+        }
+    ]
+}
+
+rpe = RPE(config)
+
+# Create resource objects, and evaluate as needed
+```
+
+And your policies may look like this:
+
+/etc/rpe/policies-python/__init__.py
+```python
+from .gcs_policy import GCPBucketVersioningPolicy
+```
+
+/etc/rpe/policies-python/gcs_policy.py
+```python
+class GCPBucketVersioningPolicy:
+
+    description = 'Require object versioning for storage buckets'
+    applies_to = ['cloudresourcemanager.googleapis.com/Project']
+
+    @classmethod
+    def compliant(cls, resource):
+        # Return true/false if the resource is compliant
+
+    @classmethod
+    def excluded(cls, resource):
+        # Return true/false if the resource is excluded
+
+    @classmethod
+    def remediate(cls, resource):
+        # Enable versioning
+```
 
 # Applications using rpe-lib
 
