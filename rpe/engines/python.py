@@ -71,17 +71,31 @@ class PythonPolicyEngine:
             self._policies.items()
         ))
 
-        evals = [
-            Evaluation(
-                resource=resource,
-                engine=self,
-                policy_id=policy_name,
-                compliant=policy_cls.compliant(resource),
-                excluded=policy_cls.excluded(resource),
-                remediable=hasattr(policy_cls, 'remediate')
-            )
-            for policy_name,policy_cls in matched_policies.items()
-        ]
+        # Loop over policy and build evals, so we can catch exceptions
+
+        evals = []
+
+        for policy_name, policy_cls in matched_policies.items():
+            try:
+
+                # Ensure that these are boolean
+                compliant = policy_cls.compliant(resource) is True
+                excluded = policy_cls.excluded(resource) is True
+
+                ev = Evaluation(
+                    resource=resource,
+                    engine=self,
+                    policy_id=policy_name,
+                    compliant=compliant,
+                    excluded=excluded,
+                    remediable=hasattr(policy_cls, 'remediate')
+                )
+
+                evals.append(ev)
+
+            # These are user-provided modules, we need to catch any exception
+            except Exception as e:
+                print(f'Evaluation exception. Policy: {policy_name}, Message: {str(e)}')
 
         return evals
 
