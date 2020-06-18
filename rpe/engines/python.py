@@ -15,24 +15,32 @@
 
 import importlib.util
 import inspect
+import sys
 
 from rpe.policy import Evaluation, Policy
 
 
 class PythonPolicyEngine:
 
-    _policies={}
+    counter = 0
 
     def __init__(self, package_path):
+
+        self._policies={}
         self.package_path = package_path
+        PythonPolicyEngine.counter += 1
+        self.package_name = 'rpe.plugins.policies.py_' + str(PythonPolicyEngine.counter)
+
         self._load_policies()
 
     def _load_policies(self):
         spec = importlib.util.spec_from_file_location(
-            "pypol",
+            self.package_name,
             "{}/__init__.py".format(self.package_path)
         )
         module = importlib.util.module_from_spec(spec)
+        sys.modules[self.package_name] = module
+
         spec.loader.exec_module(module)
 
         for name, obj in inspect.getmembers(module):
