@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 from rpe.engines import Engine
@@ -20,6 +20,7 @@ class Evaluation:
     compliant: bool
     excluded: bool
     remediable: bool
+    evaluation_artifact: dict = field(default_factory=dict)  # Data used during evaluation
 
     def remediate(self):
         return self.engine.remediate(self.resource, self.policy_id)
