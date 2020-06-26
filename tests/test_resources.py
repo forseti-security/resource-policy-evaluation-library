@@ -29,6 +29,7 @@ from rpe.resources.gcp import GcpComputeDisks
 from rpe.resources.gcp import GcpDataprocCluster
 from rpe.resources.gcp import GcpGkeCluster
 from rpe.resources.gcp import GcpGkeClusterNodepool
+from rpe.resources.gcp import GcpOrganization
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectService
 from rpe.resources.gcp import GcpPubsubSubscription
@@ -127,6 +128,14 @@ test_cases = [
         cls=GcpGkeClusterNodepool,
         resource_type='container.googleapis.com/NodePool',
         name='//container.googleapis.com/projects/my_project/locations/us-central1-a/clusters/parent_resource/nodePools/my_resource'
+    ),
+    ResourceTestCase(
+        resource_data={
+            'name': '012345678901',
+        },
+        cls=GcpOrganization,
+        resource_type='cloudresourcemanager.googleapis.com/Organization',
+        name='//cloudresourcemanager.googleapis.com/organizations/012345678901'
     ),
     ResourceTestCase(
         resource_data={

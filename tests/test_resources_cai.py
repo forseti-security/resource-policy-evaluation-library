@@ -29,6 +29,7 @@ from rpe.resources.gcp import GcpComputeDisks
 from rpe.resources.gcp import GcpDataprocCluster
 from rpe.resources.gcp import GcpGkeCluster
 from rpe.resources.gcp import GcpGkeClusterNodepool
+from rpe.resources.gcp import GcpOrganization
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectService
 from rpe.resources.gcp import GcpPubsubSubscription
@@ -149,6 +150,13 @@ test_cases = [
             "asset_type": "sqladmin.googleapis.com/Instance",
         },
         resource_cls=GcpSqlInstance
+    ),
+    CaiTestCase(
+        data={
+            "name": "//cloudresourcemanager.googleapis.com/organizations/test-resource",
+            "asset_type": "cloudresourcemanager.googleapis.com/Organization",
+        },
+        resource_cls=GcpOrganization
     ),
     CaiTestCase(
         data={

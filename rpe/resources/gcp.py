@@ -705,6 +705,28 @@ class GcpSqlInstance(GoogleAPIResource):
             'project': self._resource_data['project_id']
         }
 
+class GcpOrganization(GoogleAPIResource):
+
+    service_name = "cloudresourcemanager"
+    resource_path = "organizations"
+    version = "v1"
+
+    resource_components = {
+        'iam': 'getIamPolicy',
+    }
+
+    resource_type = "cloudresourcemanager.googleapis.com/Organization"
+
+    def _get_request_args(self):
+        return {
+            'name': 'organizations/' + self._resource_data['name']
+        }
+
+    def _get_iam_request_args(self):
+        return {
+            'resource': 'organizations/' + self._resource_data['name']
+        }
+
 
 class GcpProject(GoogleAPIResource):
 
