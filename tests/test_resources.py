@@ -26,9 +26,11 @@ from rpe.resources.gcp import GcpBigtableInstance
 from rpe.resources.gcp import GcpCloudFunction
 from rpe.resources.gcp import GcpComputeInstance
 from rpe.resources.gcp import GcpComputeDisks
+from rpe.resources.gcp import GcpDatafusionInstance
 from rpe.resources.gcp import GcpDataprocCluster
 from rpe.resources.gcp import GcpGkeCluster
 from rpe.resources.gcp import GcpGkeClusterNodepool
+from rpe.resources.gcp import GcpOrganization
 from rpe.resources.gcp import GcpProject
 from rpe.resources.gcp import GcpProjectService
 from rpe.resources.gcp import GcpPubsubSubscription
@@ -130,6 +132,14 @@ test_cases = [
     ),
     ResourceTestCase(
         resource_data={
+            'name': '012345678901',
+        },
+        cls=GcpOrganization,
+        resource_type='cloudresourcemanager.googleapis.com/Organization',
+        name='//cloudresourcemanager.googleapis.com/organizations/012345678901'
+    ),
+    ResourceTestCase(
+        resource_data={
             'name': test_project,
             'project_id': test_project
         },
@@ -145,6 +155,16 @@ test_cases = [
         cls=GcpProjectService,
         resource_type='serviceusage.googleapis.com/Service',
         name='//serviceusage.googleapis.com/projects/my_project/services/compute.googleapis.com'
+    ),
+    ResourceTestCase(
+        resource_data={
+            'name': test_resource_name,
+            'location': 'us-central1',
+            'project_id': test_project
+        },
+        cls=GcpDatafusionInstance,
+        resource_type='datafusion.googleapis.com/Instance',
+        name='//datafusion.googleapis.com/projects/my_project/locations/us-central1/instances/my_resource'
     ),
     ResourceTestCase(
         resource_data={
