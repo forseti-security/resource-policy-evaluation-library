@@ -26,6 +26,7 @@ from rpe.resources.gcp import GcpBigtableInstance
 from rpe.resources.gcp import GcpCloudFunction
 from rpe.resources.gcp import GcpComputeInstance
 from rpe.resources.gcp import GcpComputeDisks
+from rpe.resources.gcp import GcpDatafusionInstance
 from rpe.resources.gcp import GcpDataprocCluster
 from rpe.resources.gcp import GcpGkeCluster
 from rpe.resources.gcp import GcpGkeClusterNodepool
@@ -101,6 +102,13 @@ test_cases = [
             "asset_type": "compute.googleapis.com/Firewall",
         },
         resource_cls=GcpComputeFirewall
+    ),
+    CaiTestCase(
+        data={
+            "name": "//datafusion.googleapis.com/projects/test-project/locations/us-central1/instances/test-resource",
+            "asset_type": "datafusion.googleapis.com/Instance",
+        },
+        resource_cls=GcpDatafusionInstance
     ),
     CaiTestCase(
         data={
