@@ -44,7 +44,10 @@ class GoogleAPIResource(Resource):
     readiness_value = None
     readiness_terminal_values = []
 
-    def __init__(self, client_kwargs={}, **resource_data):
+    def __init__(self, client_kwargs=None, **resource_data):
+
+        if client_kwargs is None:
+            client_kwargs = {}
 
         # Set some defaults
         self._service = None
@@ -114,13 +117,18 @@ class GoogleAPIResource(Resource):
             raise ResourceException('Unrecognized resource type: {}'.format(resource_type))
 
     @classmethod
-    def from_resource_data(cls, *, resource_type, client_kwargs={}, **resource_data):
+    def from_resource_data(cls, *, resource_type, client_kwargs=None, **resource_data):
+        if client_kwargs is None:
+            client_kwargs = {}
         res_cls = cls.subclass_by_type(resource_type)
         return res_cls(client_kwargs=client_kwargs, **resource_data)
 
     @staticmethod
-    def from_cai_data(resource_name, resource_type, project_id=None, client_kwargs={}):
+    def from_cai_data(resource_name, resource_type, project_id=None, client_kwargs=None):
         ''' Attempt to return the appropriate resource using Cloud Asset Inventory-formatted resource info '''
+
+        if client_kwargs is None:
+            client_kwargs = {}
 
         res_cls = GoogleAPIResource.subclass_by_type(resource_type)
 
