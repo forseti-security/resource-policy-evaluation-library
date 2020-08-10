@@ -439,6 +439,14 @@ class GcpBigtableInstance(GoogleAPIResource):
             ),
         }
 
+    def _get_iam_request_args(self):
+        return {
+            'resource': 'projects/{}/instances/{}'.format(
+                self._resource_data['project_id'],
+                self._resource_data['name']
+            ),
+        }
+
 
 class GcpCloudFunction(GoogleAPIResource):
 
