@@ -1,3 +1,4 @@
 google-api-python-client
 google-api-python-client-helpers>=1.2.6
 jmespath
+tenacity
