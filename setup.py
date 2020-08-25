@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'google-api-python-client',
         'google-api-python-client-helpers',
+        'jmespath',
         'tenacity',
     ],
     packages=[

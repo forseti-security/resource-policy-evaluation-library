@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import jmespath
 import re
 from urllib.parse import urlparse
 from .base import Resource
@@ -30,6 +31,9 @@ class GoogleAPIResource(Resource):
     # Names of the get method of the root resource
     get_method = "get"
     required_resource_data = ['name']
+
+    # jmespath expression for getting labels
+    resource_labels_path = "resource.labels"
 
     # Other properties of a resource we might need to perform evaluations, such as iam policy
     resource_components = {}
@@ -51,6 +55,7 @@ class GoogleAPIResource(Resource):
 
         # Set some defaults
         self._service = None
+        self._resource_metadata = None
 
         # Load and validate additional resource data
         self._resource_data = resource_data
@@ -246,7 +251,11 @@ class GoogleAPIResource(Resource):
         return component_metadata
         
 
-    def get(self):
+    def get(self, refresh=True):
+
+        if not refresh and self._resource_metadata:
+            return self._resource_metadata
+
         method = getattr(self.service, self.get_method)
 
         # If the resource has readiness criteria, wait for it
@@ -272,7 +281,8 @@ class GoogleAPIResource(Resource):
         for c in self.resource_components:
             resp[c] = self._get_component(c)
 
-        return resp
+        self._resource_metadata = resp
+        return self._resource_metadata
 
     # Determine what remediation steps to take, allow for future remediation specifications
     def remediate(self, remediation):
@@ -369,6 +379,10 @@ class GoogleAPIResource(Resource):
                 **self._client_kwargs
             )
         return self._service
+
+    @property
+    def labels(self):
+        return jmespath.search(self.resource_labels_path, self.get(refresh=False))
 
     @property
     def project_id(self):
@@ -614,6 +628,8 @@ class GcpGkeCluster(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
+    resource_labels_path = "resource.resourceLabels"
+
     resource_type = "container.googleapis.com/Cluster"
 
     def _get_request_args(self):
@@ -743,6 +759,8 @@ class GcpSqlInstance(GoogleAPIResource):
     readiness_key = 'state'
     readiness_value = 'RUNNABLE'
     readiness_terminal_values = ['FAILED', 'MAINTENANCE', 'SUSPENDED', 'UNKNOWN_STATE']
+
+    resource_labels_path = "resource.settings.userLabels"
 
     resource_type = "sqladmin.googleapis.com/Instance"
 
