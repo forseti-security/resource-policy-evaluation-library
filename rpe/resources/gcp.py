@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import jmespath
 import re
 from urllib.parse import urlparse
 from .base import Resource
@@ -30,6 +31,9 @@ class GoogleAPIResource(Resource):
     # Names of the get method of the root resource
     get_method = "get"
     required_resource_data = ['name']
+
+    # jmespath expression for getting labels
+    resource_labels_path = "resource.labels"
 
     # Other properties of a resource we might need to perform evaluations, such as iam policy
     resource_components = {}
@@ -375,6 +379,10 @@ class GoogleAPIResource(Resource):
                 **self._client_kwargs
             )
         return self._service
+
+    @property
+    def labels(self):
+        return jmespath.search(self.resource_labels_path, self.get(refresh=False))
 
     @property
     def project_id(self):
@@ -749,6 +757,8 @@ class GcpSqlInstance(GoogleAPIResource):
     readiness_key = 'state'
     readiness_value = 'RUNNABLE'
     readiness_terminal_values = ['FAILED', 'MAINTENANCE', 'SUSPENDED', 'UNKNOWN_STATE']
+
+    resource_labels_path = "resource.settings.userLabels"
 
     resource_type = "sqladmin.googleapis.com/Instance"
 
