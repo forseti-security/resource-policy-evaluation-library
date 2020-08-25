@@ -51,6 +51,7 @@ class GoogleAPIResource(Resource):
 
         # Set some defaults
         self._service = None
+        self._resource_metadata = None
 
         # Load and validate additional resource data
         self._resource_data = resource_data
@@ -246,7 +247,11 @@ class GoogleAPIResource(Resource):
         return component_metadata
         
 
-    def get(self):
+    def get(self, refresh=True):
+
+        if not refresh and self._resource_metadata:
+            return self._resource_metadata
+
         method = getattr(self.service, self.get_method)
 
         # If the resource has readiness criteria, wait for it
@@ -272,7 +277,8 @@ class GoogleAPIResource(Resource):
         for c in self.resource_components:
             resp[c] = self._get_component(c)
 
-        return resp
+        self._resource_metadata = resp
+        return self._resource_metadata
 
     # Determine what remediation steps to take, allow for future remediation specifications
     def remediate(self, remediation):
