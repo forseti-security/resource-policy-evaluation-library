@@ -628,6 +628,8 @@ class GcpGkeCluster(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
+    resource_labels_path = "resource.resourceLabels"
+
     resource_type = "container.googleapis.com/Cluster"
 
     def _get_request_args(self):
