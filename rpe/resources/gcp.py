@@ -382,7 +382,11 @@ class GoogleAPIResource(Resource):
 
     @property
     def labels(self):
-        return jmespath.search(self.resource_labels_path, self.get(refresh=False))
+        labels = jmespath.search(self.resource_labels_path, self.get(refresh=False)) or {}
+        if not isinstance(labels, dict):
+            raise TypeError("Unexpected label format")
+
+        return labels
 
     @property
     def project_id(self):
