@@ -56,6 +56,7 @@ class GoogleAPIResource(Resource):
         # Set some defaults
         self._service = None
         self._resource_metadata = None
+        self._full_resource_name = None
 
         # Load and validate additional resource data
         self._resource_data = resource_data
@@ -164,6 +165,13 @@ class GoogleAPIResource(Resource):
     def type(self):
         return self.resource_type
 
+    def full_resource_name(self):
+        if self._full_resource_name is None:
+            self.gen_full_resource_name()
+
+        return self._full_resource_name
+
+
     # Google's documentation describes what it calls a 'full resource name' for
     # resources. None of the API's seem to implement it (except Cloud Asset
     # Inventory). This attempts to generate it from the discovery-based api
@@ -171,7 +179,7 @@ class GoogleAPIResource(Resource):
     #
     # If we inject it into the resource, we can use it in policy evaluation to
     # simplify the structure of our policies
-    def full_resource_name(self):
+    def gen_full_resource_name(self):
 
         method = getattr(self.service, self.get_method)
         uri = method(**self._get_request_args()).uri
@@ -233,7 +241,7 @@ class GoogleAPIResource(Resource):
 
         resource_path = "/".join(path_segments)
 
-        return "//{}.googleapis.com/{}".format(api_name, resource_path)
+        self._full_resource_name = "//{}.googleapis.com/{}".format(api_name, resource_path)
 
     def _get_component(self, component):
         method_name = self.resource_components[component]
