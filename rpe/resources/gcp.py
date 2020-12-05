@@ -544,6 +544,24 @@ class GcpComputeDisks(GoogleAPIResource):
         }
 
 
+class GcpComputeRegionDisks(GoogleAPIResource):
+
+    service_name = "compute"
+    resource_path = "regionDisks"
+    version = "v1"
+
+    required_resource_data = ['name', 'location', 'project_id']
+
+    resource_type = "compute.googleapis.com/RegionDisk"
+
+    def _get_request_args(self):
+        return {
+            'project': self._resource_data['project_id'],
+            'region': self._resource_data['location'],
+            'disk': self._resource_data['name']
+        }
+
+
 class GcpComputeSubnetwork(GoogleAPIResource):
 
     service_name = "compute"
