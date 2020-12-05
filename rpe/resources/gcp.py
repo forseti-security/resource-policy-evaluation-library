@@ -97,6 +97,9 @@ class GoogleAPIResource(Resource):
 
             #  NodePools
             'cluster': r'/clusters/([^\/]+)/',
+
+            # ServiceAccounts
+            'service_account': r'serviceAccounts/([^\/]+)/',
         }
 
         resource_data = {}
@@ -689,6 +692,44 @@ class GcpGkeClusterNodepool(GoogleAPIResource):
             )
         }
 
+
+class GcpIamServiceAccount(GoogleAPIResource):
+
+    service_name = "iam"
+    resource_path = "projects.serviceAccounts"
+    version = "v1"
+
+    required_resource_data = ['name', 'project_id']
+
+    resource_type = 'iam.googleapis.com/ServiceAccount'
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/serviceAccounts/{}'.format(
+                self._resource_data['project_id'],
+                self._resource_data['name']
+            )
+        }
+
+
+class GcpIamServiceAccountKey(GoogleAPIResource):
+
+    service_name = "iam"
+    resource_path = "projects.serviceAccounts.keys"
+    version = "v1"
+
+    required_resource_data = ['name', 'service_account', 'project_id']
+
+    resource_type = 'iam.googleapis.com/ServiceAccountKey'
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/serviceAccounts/{}/keys/{}'.format(
+                self._resource_data['project_id'],
+                self._resource_data['service_account'],
+                self._resource_data['name']
+            )
+        }
 
 class GcpPubsubSubscription(GoogleAPIResource):
 
