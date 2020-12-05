@@ -525,7 +525,7 @@ class GcpComputeInstance(GoogleAPIResource):
         }
 
 
-class GcpComputeDisks(GoogleAPIResource):
+class GcpComputeDisk(GoogleAPIResource):
 
     service_name = "compute"
     resource_path = "disks"
@@ -543,7 +543,7 @@ class GcpComputeDisks(GoogleAPIResource):
         }
 
 
-class GcpComputeRegionDisks(GoogleAPIResource):
+class GcpComputeRegionDisk(GoogleAPIResource):
 
     service_name = "compute"
     resource_path = "regionDisks"
