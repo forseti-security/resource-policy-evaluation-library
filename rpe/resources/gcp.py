@@ -171,7 +171,6 @@ class GoogleAPIResource(Resource):
 
         return self._full_resource_name
 
-
     # Google's documentation describes what it calls a 'full resource name' for
     # resources. None of the API's seem to implement it (except Cloud Asset
     # Inventory). This attempts to generate it from the discovery-based api
@@ -252,12 +251,11 @@ class GoogleAPIResource(Resource):
             req_arg_method = getattr(self, f'_get_{component}_request_args')
         else:
             req_arg_method = getattr(self, '_get_request_args')
-        
+
         method = getattr(self.service, method_name)
-        
+
         component_metadata = method(**req_arg_method()).execute()
         return component_metadata
-        
 
     def get(self, refresh=True):
 
@@ -422,13 +420,11 @@ class GcpAppEngineInstance(GoogleAPIResource):
         }
 
 
-
 class GcpBigqueryDataset(GoogleAPIResource):
 
     service_name = "bigquery"
     resource_path = "datasets"
     version = "v2"
-
 
     required_resource_data = ['name', 'project_id']
 
@@ -597,7 +593,6 @@ class GcpComputeFirewall(GoogleAPIResource):
         }
 
 
-
 class GcpDataprocCluster(GoogleAPIResource):
     service_name = "dataproc"
     resource_path = "projects.regions.clusters"
@@ -672,7 +667,6 @@ class GcpGkeCluster(GoogleAPIResource):
         }
 
 
-
 class GcpGkeClusterNodepool(GoogleAPIResource):
 
     service_name = "container"
@@ -694,7 +688,6 @@ class GcpGkeClusterNodepool(GoogleAPIResource):
                 self._resource_data['name']
             )
         }
-
 
 
 class GcpPubsubSubscription(GoogleAPIResource):
@@ -728,7 +721,6 @@ class GcpPubsubSubscription(GoogleAPIResource):
         }
 
 
-
 class GcpPubsubTopic(GoogleAPIResource):
 
     service_name = "pubsub"
@@ -758,7 +750,6 @@ class GcpPubsubTopic(GoogleAPIResource):
                 self._resource_data['name']
             )
         }
-
 
 
 class GcpStorageBucket(GoogleAPIResource):
@@ -799,6 +790,7 @@ class GcpSqlInstance(GoogleAPIResource):
             'instance': self._resource_data['name'],
             'project': self._resource_data['project_id']
         }
+
 
 class GcpOrganization(GoogleAPIResource):
 
