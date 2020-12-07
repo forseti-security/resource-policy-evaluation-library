@@ -25,7 +25,8 @@ from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpBigtableInstance
 from rpe.resources.gcp import GcpCloudFunction
 from rpe.resources.gcp import GcpComputeInstance
-from rpe.resources.gcp import GcpComputeDisks
+from rpe.resources.gcp import GcpComputeDisk
+from rpe.resources.gcp import GcpComputeRegionDisk
 from rpe.resources.gcp import GcpDatafusionInstance
 from rpe.resources.gcp import GcpDataprocCluster
 from rpe.resources.gcp import GcpGkeCluster
@@ -39,6 +40,8 @@ from rpe.resources.gcp import GcpSqlInstance
 from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpComputeFirewall
 from rpe.resources.gcp import GcpComputeSubnetwork
+from rpe.resources.gcp import GcpIamServiceAccount
+from rpe.resources.gcp import GcpIamServiceAccountKey
 
 client_kwargs = {
     'credentials': Credentials(token='')
@@ -87,7 +90,14 @@ test_cases = [
             "name": "//compute.googleapis.com/projects/test-project/zones/us-central1-a/disks/test-resource",
             "asset_type": "compute.googleapis.com/Disk",
         },
-        resource_cls=GcpComputeDisks
+        resource_cls=GcpComputeDisk
+    ),
+    CaiTestCase(
+        data={
+            "name": "//compute.googleapis.com/projects/test-project/regions/us-central1/disks/test-resource",
+            "asset_type": "compute.googleapis.com/RegionDisk",
+        },
+        resource_cls=GcpComputeRegionDisk
     ),
     CaiTestCase(
         data={
@@ -130,6 +140,20 @@ test_cases = [
             "asset_type": "container.googleapis.com/NodePool",
         },
         resource_cls=GcpGkeClusterNodepool
+    ),
+    CaiTestCase(
+        data={
+            "name": "//iam.googleapis.com/projects/test-project/serviceAccounts/foo",
+            "asset_type": "iam.googleapis.com/ServiceAccount",
+        },
+        resource_cls=GcpIamServiceAccount
+    ),
+    CaiTestCase(
+        data={
+            "name": "//iam.googleapis.com/projects/test-project/serviceAccounts/foo/keys/bar",
+            "asset_type": "iam.googleapis.com/ServiceAccountKey",
+        },
+        resource_cls=GcpIamServiceAccountKey
     ),
     CaiTestCase(
         data={

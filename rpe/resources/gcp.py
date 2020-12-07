@@ -97,6 +97,9 @@ class GoogleAPIResource(Resource):
 
             #  NodePools
             'cluster': r'/clusters/([^\/]+)/',
+
+            # ServiceAccounts
+            'service_account': r'serviceAccounts/([^\/]+)/',
         }
 
         resource_data = {}
@@ -170,7 +173,6 @@ class GoogleAPIResource(Resource):
             self.gen_full_resource_name()
 
         return self._full_resource_name
-
 
     # Google's documentation describes what it calls a 'full resource name' for
     # resources. None of the API's seem to implement it (except Cloud Asset
@@ -252,12 +254,11 @@ class GoogleAPIResource(Resource):
             req_arg_method = getattr(self, f'_get_{component}_request_args')
         else:
             req_arg_method = getattr(self, '_get_request_args')
-        
+
         method = getattr(self.service, method_name)
-        
+
         component_metadata = method(**req_arg_method()).execute()
         return component_metadata
-        
 
     def get(self, refresh=True):
 
@@ -422,13 +423,11 @@ class GcpAppEngineInstance(GoogleAPIResource):
         }
 
 
-
 class GcpBigqueryDataset(GoogleAPIResource):
 
     service_name = "bigquery"
     resource_path = "datasets"
     version = "v2"
-
 
     required_resource_data = ['name', 'project_id']
 
@@ -526,7 +525,7 @@ class GcpComputeInstance(GoogleAPIResource):
         }
 
 
-class GcpComputeDisks(GoogleAPIResource):
+class GcpComputeDisk(GoogleAPIResource):
 
     service_name = "compute"
     resource_path = "disks"
@@ -540,6 +539,24 @@ class GcpComputeDisks(GoogleAPIResource):
         return {
             'project': self._resource_data['project_id'],
             'zone': self._resource_data['location'],
+            'disk': self._resource_data['name']
+        }
+
+
+class GcpComputeRegionDisk(GoogleAPIResource):
+
+    service_name = "compute"
+    resource_path = "regionDisks"
+    version = "v1"
+
+    required_resource_data = ['name', 'location', 'project_id']
+
+    resource_type = "compute.googleapis.com/RegionDisk"
+
+    def _get_request_args(self):
+        return {
+            'project': self._resource_data['project_id'],
+            'region': self._resource_data['location'],
             'disk': self._resource_data['name']
         }
 
@@ -577,7 +594,6 @@ class GcpComputeFirewall(GoogleAPIResource):
             'firewall': self._resource_data['name'],
             'project': self._resource_data['project_id']
         }
-
 
 
 class GcpDataprocCluster(GoogleAPIResource):
@@ -654,7 +670,6 @@ class GcpGkeCluster(GoogleAPIResource):
         }
 
 
-
 class GcpGkeClusterNodepool(GoogleAPIResource):
 
     service_name = "container"
@@ -678,6 +693,43 @@ class GcpGkeClusterNodepool(GoogleAPIResource):
         }
 
 
+class GcpIamServiceAccount(GoogleAPIResource):
+
+    service_name = "iam"
+    resource_path = "projects.serviceAccounts"
+    version = "v1"
+
+    required_resource_data = ['name', 'project_id']
+
+    resource_type = 'iam.googleapis.com/ServiceAccount'
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/serviceAccounts/{}'.format(
+                self._resource_data['project_id'],
+                self._resource_data['name']
+            )
+        }
+
+
+class GcpIamServiceAccountKey(GoogleAPIResource):
+
+    service_name = "iam"
+    resource_path = "projects.serviceAccounts.keys"
+    version = "v1"
+
+    required_resource_data = ['name', 'service_account', 'project_id']
+
+    resource_type = 'iam.googleapis.com/ServiceAccountKey'
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/serviceAccounts/{}/keys/{}'.format(
+                self._resource_data['project_id'],
+                self._resource_data['service_account'],
+                self._resource_data['name']
+            )
+        }
 
 class GcpPubsubSubscription(GoogleAPIResource):
 
@@ -710,7 +762,6 @@ class GcpPubsubSubscription(GoogleAPIResource):
         }
 
 
-
 class GcpPubsubTopic(GoogleAPIResource):
 
     service_name = "pubsub"
@@ -740,7 +791,6 @@ class GcpPubsubTopic(GoogleAPIResource):
                 self._resource_data['name']
             )
         }
-
 
 
 class GcpStorageBucket(GoogleAPIResource):
@@ -781,6 +831,7 @@ class GcpSqlInstance(GoogleAPIResource):
             'instance': self._resource_data['name'],
             'project': self._resource_data['project_id']
         }
+
 
 class GcpOrganization(GoogleAPIResource):
 

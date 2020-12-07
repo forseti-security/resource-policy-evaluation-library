@@ -25,7 +25,7 @@ from rpe.resources.gcp import GcpBigqueryDataset
 from rpe.resources.gcp import GcpBigtableInstance
 from rpe.resources.gcp import GcpCloudFunction
 from rpe.resources.gcp import GcpComputeInstance
-from rpe.resources.gcp import GcpComputeDisks
+from rpe.resources.gcp import GcpComputeDisk
 from rpe.resources.gcp import GcpDatafusionInstance
 from rpe.resources.gcp import GcpDataprocCluster
 from rpe.resources.gcp import GcpGkeCluster
@@ -95,7 +95,7 @@ test_cases = [
             'location': 'us-central1-a',
             'project_id': test_project
         },
-        cls=GcpComputeDisks,
+        cls=GcpComputeDisk,
         resource_type='compute.googleapis.com/Disk',
         name='//compute.googleapis.com/projects/my_project/zones/us-central1-a/disks/my_resource'
     ),
