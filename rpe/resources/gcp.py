@@ -677,6 +677,7 @@ class GcpGkeClusterNodepool(GoogleAPIResource):
     version = "v1"
     readiness_key = 'status'
     readiness_value = 'RUNNING'
+    readiness_terminal_values = ['ERROR', 'RUNNING_WITH_ERROR', 'RECONCILING', 'STOPPING']
 
     required_resource_data = ['name', 'cluster', 'location', 'project_id']
 
