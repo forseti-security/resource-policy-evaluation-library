@@ -898,3 +898,22 @@ class GcpProjectService(GoogleAPIResource):
                 self._resource_data['name']
             )
         }
+
+
+class GcpDataflowJob(GoogleAPIResource):
+
+    service_name = "dataflow"
+    resource_path = "projects.locations.jobs"
+    version = "v1b3"
+
+    required_resource_data = ['name', 'project_id', 'location']
+
+    resource_type = 'dataflow.googleapis.com/Job'
+
+    def _get_request_args(self):
+        return {
+            'jobId': self._resource_data['name'],
+            'projectId': self._resource_data['project_id'],
+            'location': self._resource_data['location'],
+            'view': 'JOB_VIEW_DESCRIPTION'
+        }

@@ -42,6 +42,7 @@ from rpe.resources.gcp import GcpComputeFirewall
 from rpe.resources.gcp import GcpComputeSubnetwork
 from rpe.resources.gcp import GcpIamServiceAccount
 from rpe.resources.gcp import GcpIamServiceAccountKey
+from rpe.resources.gcp import GcpDataflowJob
 
 client_kwargs = {
     'credentials': Credentials(token='')
@@ -203,6 +204,13 @@ test_cases = [
             "asset_type": "serviceusage.googleapis.com/Service",
         },
         resource_cls=GcpProjectService
+    ),
+    CaiTestCase(
+        data={
+            "name": "//dataflow.googleapis.com/projects/test-project/locations/us-east1/jobs/test-resource",
+            "asset_type": "dataflow.googleapis.com/Job",
+        },
+        resource_cls=GcpDataflowJob
     ),
 ]
 
