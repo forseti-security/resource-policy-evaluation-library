@@ -39,6 +39,7 @@ from rpe.resources.gcp import GcpSqlInstance
 from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpComputeFirewall
 from rpe.resources.gcp import GcpComputeSubnetwork
+from rpe.resources.gcp import GcpDataflowJob
 
 test_project = "my_project"
 test_resource_name = "my_resource"
@@ -232,7 +233,17 @@ test_cases = [
         cls=GcpComputeFirewall,
         resource_type='compute.googleapis.com/Firewall',
         name='//compute.googleapis.com/projects/my_project/global/firewalls/my_resource'
-    )
+    ),
+    ResourceTestCase(
+        resource_data={
+            'name': test_resource_name,
+            'location': 'us-central1',
+            'project_id': test_project
+        },
+        cls=GcpDataflowJob,
+        resource_type='dataflow.googleapis.com/Job',
+        name='//dataflow.googleapis.com/projects/my_project/locations/us-central1/jobs/my_resource'
+    ),
 ]
 
 
