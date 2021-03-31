@@ -43,6 +43,7 @@ from rpe.resources.gcp import GcpComputeSubnetwork
 from rpe.resources.gcp import GcpIamServiceAccount
 from rpe.resources.gcp import GcpIamServiceAccountKey
 from rpe.resources.gcp import GcpDataflowJob
+from rpe.resources.gcp import GcpMemorystoreRedis
 
 client_kwargs = {
     'credentials': Credentials(token='')
@@ -211,6 +212,13 @@ test_cases = [
             "asset_type": "dataflow.googleapis.com/Job",
         },
         resource_cls=GcpDataflowJob
+    ),
+    CaiTestCase(
+        data={
+            "name": "//redis.googleapis.com/projects/test-project/locations/us-central1/instances/test-resource",
+            "asset_type": "redis.googleapis.com/Instance",
+        },
+        resource_cls=GcpMemorystoreRedis
     ),
 ]
 
