@@ -936,3 +936,22 @@ class GcpRedisInstance(GoogleAPIResource):
                 self._resource_data['name']
             ),
         }
+
+class GcpMemcacheInstance(GoogleAPIResource):
+
+    service_name = "memcache"
+    resource_path = "projects.locations.instances"
+    version = "v1"
+
+    required_resource_data = ['name', 'project_id', 'location']
+
+    resource_type = 'memcache.googleapis.com/Instance'
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/locations/{}/instances/{}'.format(
+                self._resource_data['project_id'],
+                self._resource_data['location'],
+                self._resource_data['name']
+            ),
+        }
