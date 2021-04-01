@@ -22,6 +22,7 @@ from rpe.exceptions import ResourceException
 from rpe.exceptions import UnsupportedRemediationSpec
 from rpe.exceptions import InvalidRemediationSpecStep
 import tenacity
+from google.api_core.client_options import ClientOptions
 from googleapiclienthelpers.discovery import build_subresource
 from googleapiclienthelpers.waiter import Waiter
 
@@ -216,6 +217,10 @@ class GoogleAPIResource(Resource):
             # also addresses the sql issue mentioned above
             if api_name == path_segments[0]:
                 path_segments.pop(0)
+
+        # Dialogflow requires you to use a regional endpoint, strip the region
+        if api_name.endswith('-dialogflow'):
+            api_name = 'dialogflow'
 
         # Remove the version from the path
         path_segments.pop(0)
@@ -732,6 +737,7 @@ class GcpIamServiceAccountKey(GoogleAPIResource):
             )
         }
 
+
 class GcpPubsubSubscription(GoogleAPIResource):
 
     service_name = "pubsub"
@@ -918,6 +924,7 @@ class GcpDataflowJob(GoogleAPIResource):
             'view': 'JOB_VIEW_DESCRIPTION'
         }
 
+
 class GcpRedisInstance(GoogleAPIResource):
 
     service_name = "redis"
@@ -937,6 +944,7 @@ class GcpRedisInstance(GoogleAPIResource):
             ),
         }
 
+
 class GcpMemcacheInstance(GoogleAPIResource):
 
     service_name = "memcache"
@@ -954,4 +962,37 @@ class GcpMemcacheInstance(GoogleAPIResource):
                 self._resource_data['location'],
                 self._resource_data['name']
             ),
+        }
+
+
+class GcpDialogflowAgent(GoogleAPIResource):
+
+    service_name = "dialogflow"
+    resource_path = "projects.locations.agents"
+    version = "v3"
+
+    required_resource_data = ['name', 'project_id', 'location']
+
+    resource_type = 'dialogflow.googleapis.com/Agent'
+
+    # Dialogflow requires that you use a regional API endpoint
+    def __init__(self, location, client_kwargs=None, **kwargs):
+
+        base_client_kwargs = {
+            'client_options': ClientOptions(api_endpoint=f'https://{location}-dialogflow.googleapis.com/')
+        }
+
+        if client_kwargs is None:
+            client_kwargs = {}
+        client_kwargs.update(base_client_kwargs)
+
+        super().__init__(client_kwargs=client_kwargs, location=location, **kwargs)
+
+    def _get_request_args(self):
+        return {
+            'name': 'projects/{}/locations/{}/agents/{}'.format(
+                self._resource_data['project_id'],
+                self._resource_data['location'],
+                self._resource_data['name'],
+            )
         }
