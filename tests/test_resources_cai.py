@@ -45,10 +45,10 @@ from rpe.resources.gcp import GcpIamServiceAccountKey
 from rpe.resources.gcp import GcpDataflowJob
 from rpe.resources.gcp import GcpRedisInstance
 from rpe.resources.gcp import GcpMemcacheInstance
+from rpe.resources.gcp import GcpDialogflowAgent
 
-client_kwargs = {
-    'credentials': Credentials(token='')
-}
+test_credentials = Credentials(token='')
+
 
 CaiTestCase = collections.namedtuple('CaiTestCase', 'data resource_cls')
 
@@ -228,6 +228,13 @@ test_cases = [
         },
         resource_cls=GcpMemcacheInstance
     ),
+    CaiTestCase(
+        data={
+            "name": "//dialogflow.googleapis.com/projects/test-project/locations/us-central1/agents/test-resource",
+            "asset_type": "dialogflow.googleapis.com/Agent",
+        },
+        resource_cls=GcpDialogflowAgent
+    ),
 ]
 
 
@@ -236,6 +243,9 @@ test_cases = [
     test_cases,
     ids=[case.resource_cls.__name__ for case in test_cases])
 def test_gcp_resource_from_cai_data(case):
+    client_kwargs = {
+        'credentials': test_credentials,
+    }
     r = GoogleAPIResource.from_cai_data(
         case.data.get('name'),
         case.data.get('asset_type'),
@@ -248,6 +258,9 @@ def test_gcp_resource_from_cai_data(case):
 def test_bad_resource_type():
 
     with pytest.raises(ResourceException) as excinfo:
+        client_kwargs = {
+            'credentials': test_credentials,
+        }
         GoogleAPIResource.from_cai_data(
             '//cloudfakeservice.googleapis.com/widgets/test-resource',
             'cloudfakeservice.googleapis.com/Widget',

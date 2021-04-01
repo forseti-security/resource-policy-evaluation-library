@@ -42,12 +42,11 @@ from rpe.resources.gcp import GcpComputeSubnetwork
 from rpe.resources.gcp import GcpDataflowJob
 from rpe.resources.gcp import GcpRedisInstance
 from rpe.resources.gcp import GcpMemcacheInstance
+from rpe.resources.gcp import GcpDialogflowAgent
 
 test_project = "my_project"
 test_resource_name = "my_resource"
-client_kwargs = {
-    'credentials': Credentials(token='')
-}
+test_credentials = Credentials(token='')
 
 ResourceTestCase = collections.namedtuple('ResourceTestCase', 'resource_data cls resource_type name')
 
@@ -266,6 +265,16 @@ test_cases = [
         resource_type='memcache.googleapis.com/Instance',
         name='//memcache.googleapis.com/projects/my_project/locations/us-central1/instances/my_resource'
     ),
+    ResourceTestCase(
+        resource_data={
+            'name': test_resource_name,
+            'location': 'us-central1',
+            'project_id': test_project
+        },
+        cls=GcpDialogflowAgent,
+        resource_type='dialogflow.googleapis.com/Agent',
+        name='//dialogflow.googleapis.com/projects/my_project/locations/us-central1/agents/my_resource'
+    ),
 ]
 
 
@@ -274,6 +283,9 @@ test_cases = [
     test_cases,
     ids=[case.cls.__name__ for case in test_cases])
 def test_gcp_from_resource(case):
+    client_kwargs = {
+        'credentials': test_credentials,
+    }
     r = GoogleAPIResource.from_resource_data(resource_type=case.resource_type, client_kwargs=client_kwargs, **case.resource_data)
     assert r.__class__ == case.cls
     assert isinstance(r._get_request_args(), dict)
@@ -299,6 +311,9 @@ def test_gcp_resource_bad_type():
     test_cases,
     ids=[case.cls.__name__ for case in test_cases])
 def test_gcp_full_resource_name(case):
+    client_kwargs = {
+        'credentials': test_credentials,
+    }
     r = GoogleAPIResource.from_resource_data(resource_type=case.resource_type, client_kwargs=client_kwargs, **case.resource_data)
     assert r.full_resource_name() == case.name
 
@@ -312,6 +327,9 @@ def test_missing_resource_data():
 
 
 def test_gcp_to_dict():
+    client_kwargs = {
+        'credentials': test_credentials,
+    }
     r = GoogleAPIResource.from_resource_data(
         resource_type='storage.googleapis.com/Bucket',
         client_kwargs=client_kwargs,
