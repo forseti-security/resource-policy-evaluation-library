@@ -40,6 +40,8 @@ from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpComputeFirewall
 from rpe.resources.gcp import GcpComputeSubnetwork
 from rpe.resources.gcp import GcpDataflowJob
+from rpe.resources.gcp import GcpRedisInstance
+from rpe.resources.gcp import GcpMemcacheInstance
 
 test_project = "my_project"
 test_resource_name = "my_resource"
@@ -243,6 +245,26 @@ test_cases = [
         cls=GcpDataflowJob,
         resource_type='dataflow.googleapis.com/Job',
         name='//dataflow.googleapis.com/projects/my_project/locations/us-central1/jobs/my_resource'
+    ),
+    ResourceTestCase(
+        resource_data={
+            'name': test_resource_name,
+            'location': 'us-central1',
+            'project_id': test_project
+        },
+        cls=GcpRedisInstance,
+        resource_type='redis.googleapis.com/Instance',
+        name='//redis.googleapis.com/projects/my_project/locations/us-central1/instances/my_resource'
+    ),
+    ResourceTestCase(
+        resource_data={
+            'name': test_resource_name,
+            'location': 'us-central1',
+            'project_id': test_project
+        },
+        cls=GcpMemcacheInstance,
+        resource_type='memcache.googleapis.com/Instance',
+        name='//memcache.googleapis.com/projects/my_project/locations/us-central1/instances/my_resource'
     ),
 ]
 
