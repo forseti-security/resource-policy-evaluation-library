@@ -44,6 +44,7 @@ from rpe.resources.gcp import GcpIamServiceAccount
 from rpe.resources.gcp import GcpIamServiceAccountKey
 from rpe.resources.gcp import GcpDataflowJob
 from rpe.resources.gcp import GcpRedisInstance
+from rpe.resources.gcp import GcpMemcacheInstance
 
 client_kwargs = {
     'credentials': Credentials(token='')
@@ -219,6 +220,13 @@ test_cases = [
             "asset_type": "redis.googleapis.com/Instance",
         },
         resource_cls=GcpRedisInstance
+    ),
+    CaiTestCase(
+        data={
+            "name": "//memcache.googleapis.com/projects/test-project/locations/us-central1/instances/test-resource",
+            "asset_type": "memcache.googleapis.com/Instance",
+        },
+        resource_cls=GcpMemcacheInstance
     ),
 ]
 
