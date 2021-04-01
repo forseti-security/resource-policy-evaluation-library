@@ -918,7 +918,7 @@ class GcpDataflowJob(GoogleAPIResource):
             'view': 'JOB_VIEW_DESCRIPTION'
         }
 
-class GcpMemorystoreRedis(GoogleAPIResource):
+class GcpRedisInstance(GoogleAPIResource):
 
     service_name = "redis"
     resource_path = "projects.locations.instances"

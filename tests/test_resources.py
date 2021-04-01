@@ -40,7 +40,7 @@ from rpe.resources.gcp import GcpStorageBucket
 from rpe.resources.gcp import GcpComputeFirewall
 from rpe.resources.gcp import GcpComputeSubnetwork
 from rpe.resources.gcp import GcpDataflowJob
-from rpe.resources.gcp import GcpMemorystoreRedis
+from rpe.resources.gcp import GcpRedisInstance
 
 test_project = "my_project"
 test_resource_name = "my_resource"
@@ -251,7 +251,7 @@ test_cases = [
             'location': 'us-central1',
             'project_id': test_project
         },
-        cls=GcpMemorystoreRedis,
+        cls=GcpRedisInstance,
         resource_type='redis.googleapis.com/Instance',
         name='//redis.googleapis.com/projects/my_project/locations/us-central1/instances/my_resource'
     ),
