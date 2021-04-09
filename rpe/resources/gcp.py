@@ -924,6 +924,10 @@ class GcpRedisInstance(GoogleAPIResource):
     resource_path = "projects.locations.instances"
     version = "v1"
 
+    readiness_key = 'state'
+    readiness_value = 'READY'
+    readiness_terminal_values = ['DELETING', 'STATE_UNSPECIFIED']
+
     required_resource_data = ['name', 'project_id', 'location']
 
     resource_type = 'redis.googleapis.com/Instance'
@@ -942,6 +946,10 @@ class GcpMemcacheInstance(GoogleAPIResource):
     service_name = "memcache"
     resource_path = "projects.locations.instances"
     version = "v1"
+
+    readiness_key = 'state'
+    readiness_value = 'READY'
+    readiness_terminal_values = ['DELETING', 'STATE_UNSPECIFIED']
 
     required_resource_data = ['name', 'project_id', 'location']
 
