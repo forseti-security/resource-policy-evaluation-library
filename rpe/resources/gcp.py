@@ -620,6 +620,10 @@ class GcpDatafusionInstance(GoogleAPIResource):
 
     required_resource_data = ['name', 'location', 'project_id']
 
+    readiness_key = 'state'
+    readiness_value = 'RUNNING'
+    readiness_terminal_values = ['FAILED', 'DELETING', 'STATUS_UNSPECIFIED']
+
     resource_components = {
         'iam': 'getIamPolicy',
     }
