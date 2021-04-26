@@ -26,7 +26,7 @@ class PythonPolicyEngine:
 
     def __init__(self, package_path):
 
-        self._policies={}
+        self._policies = {}
         self.package_path = package_path
         PythonPolicyEngine.counter += 1
         self.package_name = 'rpe.plugins.policies.py_' + str(PythonPolicyEngine.counter)
