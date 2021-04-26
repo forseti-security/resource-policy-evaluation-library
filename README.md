@@ -8,7 +8,7 @@ rpe-lib is made up of `Policy Engines (rpe.engines.Engine)` and `Resources (rpe.
 
 As an example, for GCP resources, the `remediate()` function expects details about what method to call in the Google REST API for the given resource, and what parameters to pass. So for a Google Cloud Storage Bucket, a policy that enforces bucket versioning could define remediation as a call to the buckets `patch()` method with the appropriate arguments to enable versioning.
 
-[![Build Status](https://api.travis-ci.org/forseti-security/resource-policy-evaluation-library.svg?branch=master)](https://travis-ci.org/forseti-security/resource-policy-evaluation-library/)
+[![Build Status](https://github.com/cleardataeng/resource-policy-evaluation-library/actions/workflows/build.yml/badge.svg)](https://github.com/cleardataeng/resource-policy-evaluation-library/actions/workflows/test.yml)
 [![PyPI version](https://badge.fury.io/py/rpe-lib.svg)](https://badge.fury.io/py/rpe-lib)
 
 ---
