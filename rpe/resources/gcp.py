@@ -736,6 +736,7 @@ class GcpIamServiceAccountKey(GoogleAPIResource):
             )
         }
 
+
 class GcpPubsubSubscription(GoogleAPIResource):
 
     service_name = "pubsub"
@@ -922,6 +923,7 @@ class GcpDataflowJob(GoogleAPIResource):
             'view': 'JOB_VIEW_DESCRIPTION'
         }
 
+
 class GcpRedisInstance(GoogleAPIResource):
 
     service_name = "redis"
@@ -944,6 +946,7 @@ class GcpRedisInstance(GoogleAPIResource):
                 self._resource_data['name']
             ),
         }
+
 
 class GcpMemcacheInstance(GoogleAPIResource):
 

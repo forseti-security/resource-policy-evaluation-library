@@ -4,6 +4,7 @@ from typing import List
 from rpe.engines import Engine
 from rpe.resources import Resource
 
+
 @dataclass
 class Policy:
     policy_id: str
@@ -11,12 +12,13 @@ class Policy:
     applies_to: List[str]
     description: str = ""
 
+
 @dataclass
 class Evaluation:
     resource: Resource
     engine: Engine
     policy_id: str
-    
+
     compliant: bool
     excluded: bool
     remediable: bool
