@@ -398,6 +398,10 @@ class GoogleAPIResource(Resource):
         return labels
 
     @property
+    def resource_name(self):
+        return self._resource_data.get('name')
+
+    @property
     def project_id(self):
         return self._resource_data.get('project_id')
 
@@ -558,6 +562,23 @@ class GcpComputeRegionDisk(GoogleAPIResource):
             'project': self._resource_data['project_id'],
             'region': self._resource_data['location'],
             'disk': self._resource_data['name']
+        }
+
+
+class GcpComputeNetwork(GoogleAPIResource):
+
+    service_name = "compute"
+    resource_path = "networks"
+    version = "v1"
+
+    required_resource_data = ['name', 'project_id']
+
+    resource_type = "compute.googleapis.com/Network"
+
+    def _get_request_args(self):
+        return {
+            'project': self._resource_data['project_id'],
+            'network': self._resource_data['name']
         }
 
 
